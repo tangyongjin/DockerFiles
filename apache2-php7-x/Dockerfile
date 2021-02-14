@@ -35,6 +35,7 @@ RUN apt-fast update && \
       php7.3-soap \
       php7.3-imap \
       php7.3-opcache \  
+      php7.3-bcmath \ 
       vim \
       wget \
       composer \
@@ -45,6 +46,7 @@ RUN   pecl channel-update pecl.php.net
 RUN   printf "\n" | pecl install mcrypt-1.0.2
 
 ADD 000-default.conf /etc/apache2/sites-enabled/000-default.conf
+RUN  bash -c "echo extension=mcrypt.so > /etc/php/7.3/apache2/php.ini"
 RUN  bash -c "echo extension=mcrypt.so > /etc/php/7.3/cli/php.ini"
 
 
