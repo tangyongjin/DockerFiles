@@ -2,51 +2,84 @@ version: '2'
 services:
 
   mysql:
-    image: ixp.mysql
-    container_name: ixpmysql
+    image: mysql:5.6
+    container_name: mysql
     ports:
      - "3306:3306"
     volumes:
-     # - "/var/lib/mysql/:/var/lib/mysql"
-      - "/home/mysql/:/var/lib/mysql"
+       - "/home/mysql/:/var/lib/mysql"
     environment:
-      MYSQL_ROOT_PASSWORD: cnix@1234
+      MYSQL_ROOT_PASSWORD: cnix@123456
 
-  web:
-    image: ixp.webframework
-    container_name: web 
-    privileged: true
+
+  portal-x:
+    image: node:12.18.2
+    container_name: portal-x
+    working_dir: /var/www/html/
     volumes:
-       - "/home/cnixdockers/:/dockers/"
-       - "/home/ixpdata/:/ixpdata:z"
-       - "/home/webapps/:/opt"
+      - "/home/webapps/portal-x:/var/www/html"
+    ports:
+      - "1985:1985/tcp"
+    tty: true
+    command: >
+      sh -c "npm start "
 
+
+  cnix-boss-portal:
+    image: node:12.18.2
+    container_name: cnix-boss-portal
+    working_dir: "/var/www/html"
+    volumes:
+      - "/home/webapps/cnix-boss-portal/:/var/www/html"
+    ports:
+     - "8503:8503/tcp"
+    tty: true
+    command: >
+      sh -c "npm start "
+
+
+  vue-dingding:
+    image: node:12.18.2
+    container_name: vue-dingding
+    privileged: true
+    working_dir: "/var/www/html"
+    volumes: 
+       - "/home/webapps/Dingtalk-vue/:/var/www/html"
     depends_on: 
        -  mysql
     ports:
-     - "80:80" 
+     - "3000:3000/tcp" 
     tty: true
+    command: >
+      sh -c "npm start "
 
 
-  nanx-manager:
-    image: ixp.simpleweb
-    container_name: nanx-manager
-    privileged: true
-    volumes: 
-       - "/home/webapps/cnix-nanx/:/var/www/html"
-    depends_on: 
-       -  mysql
+
+  api-x:
+    image: apache2-php7-x
+    container_name: api-x
     ports:
-     - "8090:80" 
+     - "1984:80"
+    volumes:
+      - "/home/webapps/api-x/:/var/www/html"
     tty: true
 
 
-  media:
-    image: ixp.simpleweb
-    container_name: media
+  cnix-boss-portal-api:
+    image: apache2-php7-x
+    container_name: cnix-boss-portal-api
+    ports:
+     - "8502:80"
+    volumes:
+      - "/home/webapps/cnix-boss-portal-api/:/var/www/html"
+    tty: true
+
+  md-admin:
+    image: apache2-php7-x
+    container_name: md-admin
     privileged: true
     volumes: 
-       - "/home/webapps/codeigniter-swagger-media/:/var/www/html"
+       - "/home/webapps/MD-admin/:/var/www/html"
     depends_on: 
        -  mysql
     ports:
@@ -54,12 +87,12 @@ services:
     tty: true
 
 
-  wxapis:
-    image: apache2-php7
-    container_name: wxapis
+  md-api:
+    image: apache2-php7-x
+    container_name: md-api
     privileged: true
     volumes: 
-       - "/home/webapps/codeigniter-swagger-apis/:/var/www/html"
+       - "/home/webapps/MD-api/:/var/www/html"
        - "/home/cnixdockers/docker-apache-php7/ssl/etc/letsencrypt/:/etc/letsencrypt"
        - "/home/cnixdockers/docker-apache-php7/www.chilink.com.cn.conf:/etc/apache2/sites-available/www.chilink.com.cn.conf"
 
@@ -71,138 +104,59 @@ services:
     tty: true
 
 
+  nanx-api:
+    image: apache2-php7-x
+    container_name: nanx-api
+    privileged: true
+    volumes: 
+       - "/home/webapps/nanx-api/:/var/www/html"
+
+    depends_on: 
+       -  mysql
+    ports:
+     - "8964:80" 
+    stdin_open: true
+    tty: true
 
 
-
-  socketserver:
-    image: apache2-php7
-    container_name: socketserver
+  md-socket:
+    image: apache2-php7-x
+    container_name: md-socket
     ports:
       - "9000:443"
     volumes:
-       - "/home/webapps/socket-server/src/:/var/www/html"
+       - "/home/webapps/MD-socket/src/:/var/www/html"
        - "/home/cnixdockers/docker-apache-php7/ssl/etc/letsencrypt/:/etc/letsencrypt"
        - "/home/cnixdockers/docker-apache-php7/socket-www.chilink.com.cn.conf:/etc/apache2/sites-available/socket-www.chilink.com.cn.conf"       
-       - "/home/webapps/socket-server/supervisord-apache/supervisord.conf:/etc/supervisor/conf.d/supervisord.conf"
+       - "/home/webapps/MD-socket/supervisord-apache/supervisord.conf:/etc/supervisor/conf.d/supervisord.conf"
+       - "/home/webapps/MD-socket/init.sh:/usr/local/bin/init.sh"
     tty: true
-    working_dir: "/var/www/html"
+    working_dir: "/var/www/html" 
 
-  sflowoverall:
-    image: ixp.sflowoverall
-    container_name: sflowoverall
+
+  custportal-rootui-react:
+    image: node:12.18.2
+    container_name: custportal-rootui-react
+    working_dir: /var/www/html/rootui-react
     volumes:
-      - "/home/ixpdata/:/ixpdata"
-    depends_on: 
-       -  mysql
-    ports: 
-      - "5500:5500/udp"
-
-  sflowdongxi:
-    image: ixp.sflowdongxi
-    container_name: sflowdongxi
-    volumes:
-      - "/ixpdata/:/ixpdata"
-      - "/home/cnixdockers/sflow.dongxi/dongxi.php:/dongxi.php"
-    depends_on: 
-       -  mysql
-    ports: 
-      - "5501:5501/udp"
-    environment:
-      - dbserver=mysql
-
-
-  sflowip2ip:
-    image: ixp.sflowip2ip
-    container_name: sflowip2ip
-    volumes:
-      - "/ixpdata/:/ixpdata"
-      - "/ixpdata/webapp/opt/docker/sflow/perltool/:/docker"
-    depends_on: 
-       -  mysql
-    ports: 
-      - "5502:5502/udp"
-
-  mrtg:
-    image: ixp.mrtg
-    container_name: mrtg 
-    volumes:
-      - "/home/ixpdata/:/ixpdata"
-    depends_on: 
-       -  mysql
-       -  web
-    tty: true
-
-  bgp:
-    image: ixp.bgp
-    container_name: bgp
-    volumes:
-      - "/ixpdata/:/ixpdata"
-    depends_on: 
-       -  mysql
-    tty: true
-
-
-  #wiki:
-  #  image: mprasil/dokuwiki
-  #  container_name: wiki
-  #  volumes:
-  #    - "/ixpdata/webapp/opt/docker/dokuwiki/volumes/dokuwiki/data:/dokuwiki/data"
-  #    - "/ixpdata/webapp/opt/docker/dokuwiki/volumes/dokuwiki/lib/plugins:/dokuwiki/lib/plugins"
-  #    - "/ixpdata/webapp/opt/docker/dokuwiki/volumes/dokuwiki/conf:/dokuwiki/conf"
-  #    - "/ixpdata/webapp/opt/docker/dokuwiki/volumes/dokuwiki/lib/tpl:/dokuwiki/lib/tpl"
-  #  ports:
-  #    - "8090:80/tcp"
-  #  tty: true
-
-  #ping:
-  #  image: ixp.ping
-  #  container_name: ping
-  #  volumes:
-  #    - "/ixpdata/:/ixpdata"
-  #  depends_on: 
-  #     -  mysql
-  #  tty: true
- 
-
-  watcher:
-    image: portainer/portainer
-    container_name: watcher
-    volumes:
-      - "/var/run/docker.sock:/var/run/docker.sock" 
-    tty: true
+      - "/home/webapps/custportal-rootui-react:/var/www/html"
     ports:
-     - "9005:9000"
-
-
-  zabbix:
-    image: ixp.zabbix
-    container_name: zabbix
-    volumes:
-      - "/etc/localtime:/etc/localtime"
+      - "5500:5500/tcp"
     tty: true
-    depends_on:
-       -  mysql
-    ports: 
-     - "8080:80"
-     - "10051:10051"
-     - "10052:10052"
-     - "154:154/udp"
-     - "162:162/udp"
-     - "514:514/udp"
-    environment:
-      - ZS_DBHost=mysql
-      - ZS_DBUser=root
-      - ZS_DBPassword=cnix@1234
-      - XXL_zapix=true
-      - XXL_grapher=true
+    command: >
+      sh -c "npm start "
 
-  img-server:
-     image: ixp.simpleweb
-     container_name: img-server
-     ports:
-     - "8905:80"
-     volumes:
-      - "/home/ixpdata/mrtg/members/:/var/www/html/"
-     tty: true
-     command: /usr/sbin/apache2ctl -D FOREGROUND
+
+
+  dingtalk-api:
+    image: apache2-php7-x
+    container_name: dingtalk-api
+    privileged: true
+    volumes: 
+       - "/home/webapps/Dingtalk-api-php/:/var/www/html"
+    depends_on: 
+       -  mysql
+    ports:
+     - "8905:80" 
+    tty: true
 
