@@ -1,0 +1,27 @@
+[supervisord]
+nodaemon=true
+
+
+[program:rrdcached]
+priority=1003
+command = rrdcached  -g  -l /var/run/rrdcached.sock  
+startsecs=100
+autorestart=false
+startretries=10
+
+
+
+[program:sflow-to-rrd]
+priority=1004
+command =/usr/local/bin/sflow-to-rrd-handler
+startsecs=100
+autorestart=true
+startretries=10
+
+
+[program:sshd]
+priority=1009
+command =/usr/sbin/sshd
+startsecs=100
+autorestart=true
+

@@ -1,0 +1,15 @@
+[supervisord]
+nodaemon=true
+
+
+[program:sflow-receiver]
+command =/usr/local/bin/sflowtool -4  -p 6343 -l -f 127.0.0.1/5500 -f 127.0.0.1/5501
+autorestart=false
+
+
+
+[program:cron]
+priority=1008
+command =/usr/sbin/cron -f
+startsecs=100
+autorestart=false

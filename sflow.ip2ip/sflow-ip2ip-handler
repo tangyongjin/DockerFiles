@@ -1,0 +1,353 @@
+#!/usr/bin/perl -w
+###  ip-2-ip
+###
+
+use warnings;
+use strict;
+use strict 'vars';
+use Getopt::Long;
+use Data::Dumper;
+use DBI;
+use RRDs;
+use NetAddr::IP;
+use Time::HiRes qw(ualarm gettimeofday tv_interval);
+use File::Path qw(make_path);
+
+use IXPManager::Config;
+
+my $ixp = new IXPManager::Config;	# (configfile => $configfile);
+
+#my $dbh = DBI->connect('dbi:mysql:database=ixp2;host=172.18.0.2','root','cnix@1234',{AutoCommit=>1,RaiseError=>1,PrintError=>0});
+my $dbh = $ixp->{db};
+
+my $rrdcached = defined($ixp->{ixp}->{sflow_rrdcached}) ? $ixp->{ixp}->{sflow_rrdcached} : 1;
+my $basedir = defined($ixp->{ixp}->{sflow_ip2ipdir}) ? $ixp->{ixp}->{sflow_ip2ipdir} : '/ixpdata/rrd/ip2ip';
+my $sflowtool = defined($ixp->{ixp}->{sflowtool}) ? $ixp->{ixp}->{sflowtool} : '/usr/local/bin/sflowtool';
+my $sflowtool_opts = defined($ixp->{ixp}->{sflowtool_ip2ip_opts}) ? $ixp->{ixp}->{sflowtool_ip2ip_opts} : '-l';
+
+my $timer_period = 60;
+my $daemon = 1;
+
+
+our $custid_related_tags;
+our $onepool_custid;
+
+my $pool = pool_init($dbh);
+my $taglist=tag_init($dbh);
+
+
+
+#print Dumper( $taglist);
+#die;
+
+
+
+# my $ipa='125.39.172.16';
+
+
+# my $ipb='125.39.172.161';
+
+
+# my $x=detect_ip($ipa,$ipb);
+
+
+# print Dumper($x);
+# die;
+
+
+
+my $execute_periodic = 0;
+my $quit_after_periodic = 0;
+
+# handle signals gracefully
+$SIG{TERM} = sub { $execute_periodic = 1; $quit_after_periodic = 1; };
+$SIG{QUIT} = sub { $execute_periodic = 1; $quit_after_periodic = 1; };
+$SIG{HUP} = sub { $execute_periodic = 1; };
+
+ 
+$SIG{ALRM} = sub { $execute_periodic = 1 };
+ualarm ( $timer_period*1000000, $timer_period*1000000);
+
+my $tv = [gettimeofday()];
+
+
+
+
+
+my $sflowpid = open (SFLOWTOOL, '-|', $sflowtool, split(' ', $sflowtool_opts));
+
+# methodology is to throw away as much crap as possible before parsing
+while (<SFLOWTOOL>) {
+	next unless (substr($_, 0, 4) eq 'FLOW');	# don't use regexp here for performance reasons
+	my ($ipprotocol);
+    my ($direction);
+    my ($alter_mac);
+    my ($tagfound);
+    my ($poolmac);
+    
+	chomp;
+
+
+	
+	my @sample = split (/,/);			# don't use regexp here for performance reasons
+	my (undef, $agent, $srcswport, $dstswport, $srcmac, $dstmac, $ethertype, $vlan, undef, 
+		$srcip, $dstip, $protocol, $tos, $ttl,
+		$srcport, $dstport, $tcpflags, $pktsize, $payloadsize, $samplerate) = @sample;
+
+	if ($ethertype eq '0x0800') {
+		$ipprotocol = 4;
+	} elsif ($ethertype eq '0x86dd') {
+		$ipprotocol = 6;
+	} else {
+		next;
+	}
+
+
+
+
+	my $tag= detect_ip($srcip,$dstip);
+	$poolmac=$tag->{poolmac};
+	$direction=$tag->{direction};
+    $tagfound=$tag->{tag};
+    
+    if( $tag->{poolmac}  eq $srcmac ){
+              $alter_mac=$dstmac;  
+       }
+        else
+       {
+              $alter_mac=$srcmac;
+       }
+    
+
+	if ($pool->{$poolmac}->{$alter_mac}->{$tagfound}->{$direction} ){
+		 # print "$poolmac->$alter_mac->$tagfound   $direction  size: $pktsize * $samplerate ;\n";
+         $pool->{$poolmac}->{$alter_mac}->{$tagfound}->{$direction}+= $pktsize * $samplerate;
+	}else
+	{
+          
+          if($tagfound eq 'UNKNOW'){
+
+          }else
+          {
+          	   # print "dropped   $tagfound ;\n";
+          }
+	}
+
+	if ($execute_periodic) {
+		if ($quit_after_periodic) {
+			# sometimes sflowtool doesn't die properly. Need to prioritise kill.
+			kill 9, $sflowpid;
+		}
+		my $newtv = [gettimeofday()];
+		my $interval = tv_interval($tv, $newtv);
+		$tv = $newtv;
+	    process_rrd($interval, $pool, $rrdcached);
+		if ($quit_after_periodic) {
+			exit 0;
+		}
+		$execute_periodic = 0;
+		$pool = pool_init($dbh);
+        $taglist=tag_init($dbh);
+
+		 
+	}
+}
+
+close (SFLOWTOOL);
+
+# try to kill off sflowtool if it's not already dead
+kill 9, $sflowpid;
+
+# oops, we should never exit
+die "Oops, input pipe died. Aborting.\n";
+
+
+
+sub process_rrd {
+
+	my ($interval, $matrix, $rrdcached) = @_;
+	my ($aggregate, $rrdfile);
+	
+    foreach my $one_poolmac  (keys %{$matrix }) 
+    {
+    	   foreach my $one_cust (keys %{$matrix->{$one_poolmac}}) 
+    	   {
+    	   	     foreach my $one_tag (keys %{$matrix->{$one_poolmac}->{$one_cust}}) 
+					{
+					   
+   				   	   $rrdfile = $basedir."/".$one_poolmac."/".$one_cust."/".$one_tag.".rrd";
+                       my $traffic_in = $matrix->{$one_poolmac}->{$one_cust}->{$one_tag}->{in};
+					   my $traffic_out= $matrix->{$one_poolmac}->{$one_cust}->{$one_tag}->{out};
+
+                       if ( $one_poolmac eq '12345678'  ){
+
+                       	}
+                       	else
+                       	{
+                         build_update_rrd ($rrdfile,$traffic_in,$traffic_out,$interval, $rrdcached);
+                       	}
+					}
+    	   }
+    }
+}
+
+
+
+
+sub build_update_rrd
+{
+	use File::Path qw(make_path);
+	use File::Basename;
+		
+	my ($rrdfile,$traffic_in,$traffic_out, $interval, $rrdcached) = @_;
+	my @rrds_options = ();
+	my $rrd_err;
+
+	$traffic_in = 0 if (!defined($traffic_in));
+    $traffic_out = 0 if (!defined($traffic_out));
+
+
+	if (!-s $rrdfile) {
+		my $dir = dirname($rrdfile);
+		if (!-d $dir) {
+			make_path($dir) or die "Could not make directory: $dir: $!\n";
+		}
+
+		my @rrds_create_options = (
+			'DS:traffic_in:GAUGE:600:U:U',
+			'DS:traffic_out:GAUGE:600:U:U',
+			'RRA:AVERAGE:0.5:1:600',    'RRA:MAX:0.5:1:600',
+			'RRA:AVERAGE:0.5:6:700',    'RRA:MAX:0.5:6:700', 
+			'RRA:AVERAGE:0.5:24:750',   'RRA:MAX:0.5:24:750',  
+			'RRA:AVERAGE:0.5:288:3650', 'RRA:MAX:0.5:288:3650',
+		);
+
+
+		RRDs::create ($rrdfile, @rrds_create_options);
+		$rrd_err = RRDs::error;
+		print STDERR "WARNING: while updating $rrdfile: $rrd_err\n" if $rrd_err;
+	}
+
+	if ($rrdcached) {
+		push @rrds_options, '--daemon', 'unix:/var/run/rrdcached.sock';
+	}
+
+
+	my $rrdvalues = "N:".int($traffic_in/$interval).":".int($traffic_out/$interval);
+
+	RRDs::update ($rrdfile, @rrds_options, $rrdvalues);
+
+	$rrd_err = RRDs::error;
+	print STDERR "WARNING: while updating $rrdfile: $rrd_err\n" if $rrd_err;
+}
+
+
+ 
+
+
+sub pool_related_tag
+{
+	my ($dbh,$pool_custid) = @_;
+	my ($sth,$tags);
+	my $query = " select tag from a_ip_biz where custid= $pool_custid ";
+	($sth = $dbh->prepare($query)) or die "$dbh->errstr\n";
+	$sth->execute() or die "$dbh->errstr\n";
+	while (my $rec = $sth->fetchrow_hashref) {
+
+             $tags->{ $rec->{tag} }->{in}=0.01;
+             $tags->{ $rec->{tag} }->{out}=0.01;
+	}
+    $sth->finish();
+	return $tags;
+}
+
+
+
+sub pool_init
+{
+	my ($dbh) = @_;
+	my $sth;
+	my $sth2;
+    my $poolinfo;
+
+	my $query = " select mac,custid from 
+				  view_cust_mac
+				  where view_cust_mac.custid in (
+				  select distinct custid from a_ip_biz ) ";
+
+
+	($sth = $dbh->prepare($query)) or die "$dbh->errstr\n";
+	$sth->execute() or die "$dbh->errstr\n";
+
+	while (my $onepool = $sth->fetchrow_hashref) {
+        
+        $onepool_custid= $onepool->{custid};
+		my $sql = " select mac,custid from view_cust_mac where view_cust_mac.custid <> $onepool->{custid} ";
+        ($sth2 = $dbh->prepare($sql)) ;
+        $sth2->execute() ;
+        while (my $customer = $sth2->fetchrow_hashref){
+        	   my $custmac=$customer->{mac};
+        	   $custid_related_tags=pool_related_tag($dbh, $onepool_custid);
+               $poolinfo->{$onepool->{mac}}->{$custmac} =$custid_related_tags;
+        }
+        $sth2->finish();
+	}
+	$sth->finish();
+	return $poolinfo;
+}
+
+
+sub tag_init
+{
+	my ($dbh) = @_;
+	my ($sth,$sth2,$taglist);
+	my $query = "  select ip, tag,mac from a_ip_biz,view_cust_mac where a_ip_biz.custid=view_cust_mac.custid";
+	$sth = $dbh->prepare($query);
+	$sth->execute() ;
+	while (my $rec = $sth->fetchrow_hashref) {
+	     $taglist->{$rec->{ip}}->{tag}=$rec->{tag};
+	     $taglist->{$rec->{ip}}->{poolmac}=$rec->{mac};
+	         
+	}
+	return $taglist;
+}
+
+
+sub print_hash {
+    my $href = shift;
+    print "$_\t=> $href->{$_}\n" for keys %{$href};
+}
+
+
+
+sub detect_ip
+{
+ 
+  my ($ip_src,$ip_dst) = @_;
+  my $tmp_hash;  
+  $tmp_hash->{tag}='UNKNOW';
+  $tmp_hash->{poolmac}='12345678';
+  $tmp_hash->{direction}='-';
+
+  foreach my $ip_range (keys %{$taglist}) {
+
+		my $network  = NetAddr::IP->new($ip_range);
+		my $x_ip_src = NetAddr::IP->new($ip_src);
+		my $x_p_dst= NetAddr::IP->new($ip_dst);
+
+
+		if ($x_ip_src->within($network)) {
+			    $tmp_hash=$taglist->{$ip_range};
+                $tmp_hash->{direction}='in';
+		        return $tmp_hash;
+		}
+
+		if ($x_p_dst->within($network)) {
+
+  			    $tmp_hash=$taglist->{$ip_range};
+  			    $tmp_hash->{direction}='out';
+		        return $tmp_hash;
+		}
+ }
+   return $tmp_hash;
+}

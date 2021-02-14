@@ -1,0 +1,523 @@
+#!/usr/bin/perl -w
+#东西向处理/含汇总
+
+use warnings;
+use strict;
+use Getopt::Long;
+use Data::Dumper;
+use RRDs;
+use Time::HiRes qw(ualarm gettimeofday tv_interval);
+use IXPManager::Config;
+
+my $ixp = new IXPManager::Config;	# (configfile => $configfile);
+my $dbh = $ixp->{db};
+
+my $debug = defined($ixp->{ixp}->{debug}) ? $ixp->{ixp}->{debug} : 0;
+
+
+my $biztypetable = reload_biztypetable($dbh);
+
+my $matrix_dongxi = matrix_init_dongxi($dbh,$biztypetable);
+
+
+
+my $insanedebug = 0;
+my $rrdcached = defined($ixp->{ixp}->{sflow_rrdcached}) ? $ixp->{ixp}->{sflow_rrdcached} : 1;
+my $sflowtool = defined($ixp->{ixp}->{sflowtool}) ? $ixp->{ixp}->{sflowtool} : '/usr/bin/sflowtool';
+my $sflowtool_opts = defined($ixp->{ixp}->{sflowtool_biz_opts}) ? $ixp->{ixp}->{sflowtool_biz_opts} : '-l';
+my $basedir = defined($ixp->{ixp}->{sflow_rrddir}) ? $ixp->{ixp}->{sflow_rrddir} : '/data/ixpmatrix';
+my $timer_period = 60;
+my $daemon = 1;
+
+# conundrum: do we run GetOptions() before creating a new IXPManager::Config
+# object, which would allow us to set the configfile location on the command
+# line?  Or do we do it after, which allows us to override the config file
+# arguments on the command line. first world problems.
+
+GetOptions(
+	'debug!'		=> \$debug,
+	'insanedebug!'		=> \$insanedebug,
+	'daemon!'		=> \$daemon,
+	'sflowtool=s'		=> \$sflowtool,
+	'sflowtool_opts=s'	=> \$sflowtool_opts,
+	'sflow_rrddir=s'	=> \$basedir,
+	'flushtimer=i'		=> \$timer_period
+);
+
+if ($insanedebug) {
+	$debug = 1;
+}
+
+my $mactable = reload_mactable($dbh);
+my $matrix = matrix_init_dongxi($dbh,$biztypetable);
+
+
+
+my $execute_periodic = 0;
+my $quit_after_periodic = 0;
+
+# handle signals gracefully
+$SIG{TERM} = sub { $execute_periodic = 1; $quit_after_periodic = 1; };
+$SIG{QUIT} = sub { $execute_periodic = 1; $quit_after_periodic = 1; };
+$SIG{HUP} = sub { $execute_periodic = 1; };
+
+# set up a periodic timer to signal that stuff should be flushed out.  The
+# flush isn't performed in the SIGALRM callback function because perl has
+# historical problems doing complicated stuff in signal handler functions.
+# Much more sensible to raise a flag and have the main code body handle this
+# during normal code exceution.
+
+$SIG{ALRM} = sub { $execute_periodic = 1 };
+ualarm ( $timer_period*1000000, $timer_period*1000000);
+
+my $tv = [gettimeofday()];
+
+# FIXME - spaces embedded *within* sflowtool args will be split too
+#         Should only ever matter for the "-r" option if the filename has spaces in it...
+my $sflowpid = open (SFLOWTOOL, '-|', $sflowtool, split(' ', $sflowtool_opts));
+
+# methodology is to throw away as much crap as possible before parsing
+while (<SFLOWTOOL>) {
+	next unless (substr($_, 0, 4) eq 'FLOW');	# don't use regexp here for performance reasons
+	my ($ipprotocol);
+
+	chomp;
+
+	$insanedebug && print STDERR "DEBUG: $_\n";
+
+	# parse and split out all the data.  most of this is unused at the
+	# moment, but it's useful to collect it anyway
+	# FLOW,193.242.111.152,2,21,0013136f2fc0,0010a52f261f,0x0800,10,10,94.1.115.114,80.1.2.222,6,0x00,124,1863,750,0x18,179,165,1024
+	my @sample = split (/,/);			# don't use regexp here for performance reasons
+	my (undef, $agent, $srcswport, $dstswport, $srcmac, $dstmac, $ethertype, $vlan, undef, 
+		$srcip, $dstip, $protocol, $tos, $ttl,
+		$srcport, $dstport, $tcpflags, $pktsize, $payloadsize, $samplerate) = @sample;
+
+	if ($ethertype eq '0x0800') {
+		$ipprotocol = 4;
+	} elsif ($ethertype eq '0x86dd') {
+		$ipprotocol = 6;
+	} else {
+		next;
+	}
+
+	# each vid may have multiple VLIs associated with it.  The only way
+	# to determine which is the correct one is to iterate through the
+	# array of potential candidates and do a vlan/vid match.  The
+	# database schema guarantees that this is a unique mapping.
+
+	my $srcvli = 0; my $dstvli = 0;
+	
+	##根据mac地址寻找vid
+	foreach my $srcvid (@{$mactable->{mac}->{$srcmac}}) {
+		if (defined($matrix->{vlanmap}->{$vlan}->{$srcvid})) {
+			$srcvli = $matrix->{vlanmap}->{$vlan}->{$srcvid};
+		}
+	}
+
+	foreach my $dstvid (@{$mactable->{mac}->{$dstmac}}) {
+		if (defined($matrix->{vlanmap}->{$vlan}->{$dstvid})) {
+			$dstvli = $matrix->{vlanmap}->{$vlan}->{$dstvid};
+		}
+	}
+    
+
+	my $srcname = defined ($matrix->{names}->{$srcvli}) ? $matrix->{names}->{$srcvli} : '(unknown)';
+	my $dstname = defined ($matrix->{names}->{$dstvli}) ? $matrix->{names}->{$dstvli} : '(unknown)';
+
+	# the sflow accounting perimeter on the switches will ensure that
+	# each packet will be counted exactly once.  because of this, the
+	# packet sample needs to be added to both the source vlaninterface
+	# for bytes in and the destination vlaninterface for bytes out for
+	# the individual counts.
+
+	if ($ipprotocol && $srcvli && $dstvli && ($srcvli != $dstvli) ) {
+		$insanedebug && print STDERR "DEBUG: accepted update for: ".
+			"protocol: $ipprotocol ".
+			"vlan: $vlan ".
+			"srcvli: $srcvli / '$srcname' ".
+			"dstvli: $dstvli / '$dstname' ".
+			"pktsize: $pktsize ".
+			"samplerate: $samplerate ".
+			"\n";
+	
+         ##补丁,根据biztype汇总到每个客户
+		
+		my $biztype_src  = find_biz_type( $biztypetable ,$srcvli ) ;
+		my $biztype_dst  = find_biz_type( $biztypetable ,$dstvli ) ;
+        
+		 
+		$matrix->{dongxi}->{$ipprotocol}->{bytes}->{$srcvli}->{$biztype_dst}->{in}  += $pktsize * $samplerate;
+		$matrix->{dongxi}->{$ipprotocol}->{bytes}->{$dstvli}->{$biztype_src}->{out} += $pktsize * $samplerate;
+        $matrix->{dongxi}->{$ipprotocol}->{pkts}->{$srcvli}->{$biztype_dst}->{in}  +=  $samplerate;
+		$matrix->{dongxi}->{$ipprotocol}->{pkts}->{$dstvli}->{$biztype_src}->{out} +=  $samplerate;
+
+        ##补丁, 根据biztype汇总全局结果.
+
+       	$matrix->{dxtotal}->{$ipprotocol}->{bytes}->{$biztype_src}->{$biztype_dst}->{in}  += $pktsize * $samplerate;
+		$matrix->{dxtotal}->{$ipprotocol}->{bytes}->{$biztype_dst}->{$biztype_src}->{out} += $pktsize * $samplerate;
+        $matrix->{dxtotal}->{$ipprotocol}->{pkts}->{$biztype_src}->{$biztype_dst}->{in}  +=  $samplerate;
+		$matrix->{dxtotal}->{$ipprotocol}->{pkts}->{$biztype_dst}->{$biztype_src}->{out} +=  $samplerate;
+
+
+		
+	} else {
+		$debug && print STDERR "DEBUG: dropped update for: ".
+			"protocol: $ipprotocol ".
+			"vlan: $vlan ".
+			"srcvli: $srcvli / '$srcname' ".
+			"dstvli: $dstvli / '$dstname' ".
+			"pktsize: $pktsize ".
+			"samplerate: $samplerate ".
+			"\n";
+		$debug && print STDERR "DEBUG: rejected: ".$_."\n";
+	}
+	
+	if ($execute_periodic) {
+		if ($quit_after_periodic) {
+			# sometimes sflowtool doesn't die properly. Need to prioritise kill.
+			kill 9, $sflowpid;
+		}
+		my $newtv = [gettimeofday()];
+		my $interval = tv_interval($tv, $newtv);
+		$tv = $newtv;
+		$debug && print STDERR "DEBUG: starting rrd flush at time interval: $interval, time: ".time()."\n";
+
+		process_rrd_dongxi($interval, $matrix, $rrdcached);
+		
+		if ($quit_after_periodic) {
+			$debug && print STDERR "DEBUG: orderly quit at ".time()."\n";
+			exit 0;
+		}
+
+		$execute_periodic = 0;
+		$mactable = reload_mactable($dbh);
+		$matrix = matrix_init_dongxi($dbh,$biztypetable);
+		$debug && print STDERR "DEBUG: flush completed at ".time()."\n";
+	}
+}
+
+close (SFLOWTOOL);
+
+# try to kill off sflowtool if it's not already dead
+kill 9, $sflowpid;
+
+# oops, we should never exit
+die "Oops, input pipe died. Aborting.\n";
+
+#
+# write traffic matrix out to RRD file while calculating totals
+#
+
+
+#根据 vid寻找对应的 biztype
+
+
+sub find_biz_type {
+        
+         my ($biztypetable, $vli) = @_;
+ 	     my $biztype;
+		 my $biztype_arr;
+
+         if (defined($biztypetable->{bizlist}->{$vli})) {
+									$biztype_arr =$biztypetable->{bizlist}->{$vli} ;
+									$biztype = $biztype_arr->[0];
+						  } else {
+						  	        $biztype = 10000; 
+						  }
+	 return $biztype;
+}
+
+ 
+ 
+#东西向处理:
+sub process_rrd_dongxi {
+	my ($interval, $matrix, $rrdcached) = @_;
+	my ($aggregate, $rrdfile);
+	
+
+
+    ## 根据cust 和 biztype写文件
+    foreach my $ipprotocol (qw(4)) {
+		foreach my $rrdtype (qw(bytes pkts)) {
+			foreach my $vlan (keys %{$matrix_dongxi->{vlilist}}) {
+				foreach my $srcvli (keys %{$matrix_dongxi->{vlilist}->{$vlan}}) {
+					foreach my $biz (keys %{$matrix_dongxi->{dongxi}->{$ipprotocol}->{$rrdtype}->{$srcvli}} ) {
+				
+						$rrdfile = sprintf("$basedir/ipv$ipprotocol/$rrdtype/dongxi/src-%05d/dongxi.ipv$ipprotocol.$rrdtype.src-%05d.biz-%05d.rrd", $srcvli, $srcvli, $biz);
+					
+						my $biz_in  = $matrix->{dongxi}->{$ipprotocol}->{$rrdtype}->{$srcvli}->{$biz}->{in};
+						my $biz_out = $matrix->{dongxi}->{$ipprotocol}->{$rrdtype}->{$srcvli}->{$biz}->{out};
+						build_update_rrd ($rrdfile, $rrdtype, $ipprotocol, $biz_in, $biz_out, $interval, $rrdcached);
+
+					}
+				 }
+			}
+		}
+	}
+
+
+
+    ## 根据biztype/biztype写文件
+    foreach my $ipprotocol (qw(4)) {
+		foreach my $rrdtype (qw(bytes pkts)) {
+               foreach my $typea (keys %{$matrix_dongxi->{dxtotal}->{$ipprotocol}->{$rrdtype} } ) {
+                    foreach my $typeb (keys %{$matrix_dongxi->{dxtotal}->{$ipprotocol}->{$rrdtype}->{$typea}}  ) {
+
+                    	$rrdfile = sprintf("$basedir/ipv$ipprotocol/$rrdtype/dxtotal/biz-%05d/dongxi.ipv$ipprotocol.$rrdtype.biz-%05d.biz-%05d.rrd", $typea, $typea, $typeb);
+					    
+					     print Dumper($rrdfile); # much better
+
+						my $total_in  = $matrix->{dxtotal}->{$ipprotocol}->{$rrdtype}->{$typea}->{$typeb}->{in};
+						my $total_out = $matrix->{dxtotal}->{$ipprotocol}->{$rrdtype}->{$typea}->{$typeb}->{out};
+						build_update_rrd ($rrdfile, $rrdtype, $ipprotocol, $total_in, $total_out, $interval, $rrdcached);
+               } 
+			}
+		}
+	}
+
+
+
+}
+
+
+sub build_update_rrd
+{
+	use File::Path qw(make_path);
+	use File::Basename;
+		
+	my ($rrdfile, $rrdtype, $ipprotocol, $in, $out, $interval, $rrdcached) = @_;
+	my @rrds_options = ();
+	my $rrd_err;
+
+	$in = 0 if (!defined($in));
+	$out = 0 if (!defined($out));
+	
+
+	if (!-s $rrdfile) {
+		my $dir = dirname($rrdfile);
+		if (!-d $dir) {
+			make_path($dir) or die "Could not make directory: $dir: $!\n";
+		}
+		my @rrds_create_options = (
+			'DS:traffic_in:GAUGE:600:U:U',
+			'DS:traffic_out:GAUGE:600:U:U',
+			'RRA:AVERAGE:0.5:1:600',    'RRA:MAX:0.5:1:600',
+			'RRA:AVERAGE:0.5:6:700',    'RRA:MAX:0.5:6:700', 
+			'RRA:AVERAGE:0.5:24:750',   'RRA:MAX:0.5:24:750',  
+			'RRA:AVERAGE:0.5:288:3650', 'RRA:MAX:0.5:288:3650',
+		);
+
+		RRDs::create ($rrdfile, @rrds_create_options);
+		$rrd_err = RRDs::error;
+		print STDERR "WARNING: while updating $rrdfile: $rrd_err\n" if $rrd_err;
+	}
+
+	if ($rrdcached) {
+		push @rrds_options, '--daemon', 'unix:/var/run/rrdcached.sock';
+	}
+
+	my $rrdvalues = "N:".int($in/$interval).":".int($out/$interval);
+	RRDs::update ($rrdfile, @rrds_options, $rrdvalues);
+
+	$rrd_err = RRDs::error;
+	print STDERR "WARNING: while updating $rrdfile: $rrd_err\n" if $rrd_err;
+}
+
+#
+# build up complete up-to-date blank matrix of all relevant traffic data
+#
+
+sub matrix_init_dongxi
+{
+	my ($dbh,$biztypetable) = @_;
+	my ($sth, $matrix);
+    my $biztype;
+	my $biztype_arr;
+	# we need this to be distinct because of 802.3ag LAGs, where there
+	# can be multiple physical ports associated with a single VLI
+
+	my $query = "
+SELECT DISTINCT
+	vli.vlaninterfaceid,
+	vli.virtualinterfaceid,
+	vli.vlan,
+	cu.name
+FROM
+	(view_vlaninterface_details_by_custid vli, cust cu)
+WHERE
+	vli.custid = cu.id 
+ORDER BY
+	virtualinterfaceid
+";
+
+	($sth = $dbh->prepare($query)) or die "$dbh->errstr\n";
+	$sth->execute() or die "$dbh->errstr\n";
+
+	while (my $rec = $sth->fetchrow_hashref) {
+		# mapping from virtualinterfaceid->vlaninterfaceid
+		$matrix->{vlanmap}->{$rec->{vlan}}->{$rec->{virtualinterfaceid}} = $rec->{vlaninterfaceid};
+		# mapping from virtualinterfaceid->name
+		$matrix->{names}->{$rec->{vlaninterfaceid}} = $rec->{name};
+
+		# create list of vlids for convenience.  We use a hash here
+		# instead of a strict array because the hash will guarantee
+		# that the keys are unique.  This is important because if
+		# there is a db screwup, you could end up with multiply
+		# referenced objects, and this will lead to data being
+		# counted multiple times.
+		
+		$matrix->{vlilist}->{$rec->{vlan}}->{$rec->{vlaninterfaceid}} = 1;
+	}
+
+	# Not all srcvli/dstvli combinations are valid.  We only consider
+	# those which are on the same vlan.
+
+	foreach my $ipprotocol (qw(4)) {
+		foreach my $rrdtype (qw(bytes pkts)) {
+
+
+			$matrix->{dxtotal}->{$ipprotocol}->{$rrdtype} = get_biztype_matrix( $dbh);
+
+			foreach my $vlan (keys %{$matrix->{vlilist}}) {
+
+				foreach my $srcvli (keys %{$matrix->{vlilist}->{$vlan}}) {
+					foreach my $dstvli (keys %{$matrix->{vlilist}->{$vlan}}) {
+						next if ($srcvli == $dstvli);
+						$matrix->{p2p}->{$ipprotocol}->{$rrdtype}->{$dstvli}->{$srcvli} = 0;
+					   
+
+					      if (defined($biztypetable->{bizlist}->{$srcvli})) {
+									$biztype_arr =$biztypetable->{bizlist}->{$srcvli} ;
+									$biztype = $biztype_arr->[0];
+						  } else {
+						  	        $biztype = 10000; 
+						  }
+						$matrix->{dongxi}->{$ipprotocol}->{$rrdtype}->{$dstvli}->{$biztype}->{in} = 0;
+  					    $matrix->{dongxi}->{$ipprotocol}->{$rrdtype}->{$dstvli}->{$biztype}->{out} = 0;
+					}
+					
+					 
+				}
+				 
+			}
+		}
+	}
+
+	return $matrix;
+}
+
+
+
+
+
+sub get_biztype_matrix
+{
+	my ($dbh) = @_;
+	my ($sth, $typematrix);
+    my $typea;
+    my $typeb;
+    
+    my $typelista;
+    my $typelistb;
+    
+	my $biztype_arr;
+
+	my $query = "select id  as onetype   from a_biz_type  order by id ";
+
+	($sth = $dbh->prepare($query)) or die "$dbh->errstr\n";
+	 $sth->execute() or die "$dbh->errstr\n";
+
+     while (my $rec = $sth->fetchrow_hashref) {
+            $typelista->{ $rec->{onetype} } =  $rec->{onetype};
+            $typelistb->{ $rec->{onetype} } =  $rec->{onetype};
+     
+     }
+
+     foreach my $typea (keys %{$typelista}) {
+           foreach my $typeb (keys %{$typelistb}) {
+              
+                $typematrix->{$typea}->{$typeb}->{in} = 0;
+				$typematrix->{$typea}->{$typeb}->{out} = 0;
+           }
+     }
+
+     # print Dumper($typematrix);
+     
+     # die;
+     return $typematrix
+  }
+
+
+
+
+# 
+# Create a mapping from macaddress->virtualinterfaceid
+# 
+
+sub reload_mactable
+{
+	my ($dbh) = @_;
+	my ($sth, $pmactable);
+
+	my $query = "
+SELECT DISTINCT
+	vi.virtualinterfaceid AS id,
+	m.mac   
+FROM (
+	view_vlaninterface_details_by_custid vi,
+	cust cu,
+	macaddress m
+)
+WHERE
+	vi.virtualinterfaceid = m.virtualinterfaceid
+AND	vi.custid = cu.id
+ORDER BY
+	id
+";
+
+
+	($sth = $dbh->prepare($query)) or die "$dbh->errstr\n";
+	$sth->execute() or die "$dbh->errstr\n";
+	while (my $rec = $sth->fetchrow_hashref) {
+		push (@{$pmactable->{mac}->{$rec->{mac}}}, $rec->{id});
+	}
+
+	my $mac;
+	if ($debug) {
+		for $mac (keys %{$pmactable->{mac}}) {
+			print STDERR "DEBUG: mac-map $mac vlid: ".join (",", @{$pmactable->{mac}->{$mac}})."\n";
+		}
+	}
+	return $pmactable;
+}
+
+
+
+sub reload_biztypetable
+{
+	my ($dbh) = @_;
+	my ($sth, $biztypetable);
+
+	my $query = "
+select biz_id,virtualinterfaceid 
+from 
+cust_biz,view_vlaninterface_details_by_custid
+where cust_biz.customer_id=view_vlaninterface_details_by_custid.custid
+";
+
+
+	($sth = $dbh->prepare($query)) or die "$dbh->errstr\n";
+	$sth->execute() or die "$dbh->errstr\n";
+	while (my $rec = $sth->fetchrow_hashref) {
+		push (@{$biztypetable->{bizlist}->{$rec->{virtualinterfaceid}}}, $rec->{biz_id});
+	}
+
+	my $virtualinterfaceid;
+	if ($debug) {
+		for $virtualinterfaceid (keys %{$biztypetable->{bizlist}}) {
+			print STDERR "DEBUG: mac-map $virtualinterfaceid vlid: ".join (",", @{$biztypetable->{bizlist}->{$virtualinterfaceid}})."\n";
+		}
+	}
+	return $biztypetable;
+}

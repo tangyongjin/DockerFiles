@@ -1,0 +1,101 @@
+###
+### AS65512 - CNIX  Test_switch
+### 
+###
+### Define inbound filter
+#
+filter ps_test1_v4_as65512_in
+	  int  cus_as;
+    pair prepend_aspath_1X;
+    pair prepend_aspath_2X;
+    pair prepend_aspath_3X;
+  	pair send_all_1_63602;
+	  pair deny_all_0_63602;
+	{		
+		cus_as = 65512;
+		if  (in_martians()) then {
+			reject;
+		}
+    if  (in_cnix_route()) then {
+      reject; 
+    	    }
+   deny_all_0_63602=(0,myas);
+   if ( deny_all_0_63602  ~  bgp_community  ) then {
+       bgp_community.empty;
+       accept;
+ 		 }
+	# accept as-path prepend 1x   
+         prepend_aspath_1X=(11,cus_as);
+      	 if ((bgp_path.last = cus_as) && ( prepend_aspath_1X  ~   bgp_community  )) then {
+             bgp_path.prepend(cus_as);
+		    	   accept; 
+		 }
+	# accept as-path prepend 2x
+         prepend_aspath_2X=(12,cus_as);
+      	 if ((bgp_path.last = cus_as) && ( prepend_aspath_2X  ~   bgp_community  )) then {
+               bgp_path.prepend(cus_as);
+               bgp_path.prepend(cus_as);
+			         accept; 
+		 }
+	# accept as-path prepend 3x
+         prepend_aspath_3X=(13,cus_as);
+      	 if ((bgp_path.last = cus_as) && ( prepend_aspath_3X  ~   bgp_community  )) then {
+               bgp_path.prepend(cus_as);
+               bgp_path.prepend(cus_as);
+               bgp_path.prepend(cus_as);
+			   accept; 
+		 }
+         send_all_1_63602=(1,myas);
+         if  ((bgp_path.last = cus_as) && ( send_all_1_63602 !~  bgp_community )) then {
+               bgp_community.add(send_all_1_63602);
+               accept;
+ 		  }        
+	reject "defalut reject" ;
+}
+
+### Define outbound filter
+filter ps_test1_v4_as65512_out
+	int  cus_as;
+	pair deny_sent_0_as;
+	pair allow_sent_1_as;
+	pair send_all_1_63602;
+{
+    cus_as = 65512;
+    # reject martians
+		if  (in_martians()) then {
+ 	        #print net;
+			reject; #"reject:in_martians";
+		}
+	  # reject appoint community
+		deny_sent_0_as = ( 0,cus_as );
+		if ( deny_sent_0_as ~ bgp_community ) then {
+		#	bgp_community.no_advertise();
+			reject; #"reject 0:as";
+	   	}
+  	#  accept sent cnix route
+  		if (in_cnix_route()) then {
+  			accept; 
+  		}
+  	# accept appoint community
+  		allow_sent_1_as = ( 1,cus_as );
+  		if ( allow_sent_1_as ~ bgp_community ) then {
+  			accept;
+  		}
+  	# accept send all
+  		send_all_1_63602 = ( 1,myas);
+  		if ( send_all_1_63602 ~ bgp_community ) then {
+  			accept;
+  		}
+reject "defalut reject" ;
+}
+
+
+### Define protocol
+## 2017-03-19 - jason with bird 1.6.3
+protocol bgp test1_as65512 from PEERS {
+  	description "eBGP - test switch";
+  	neighbor 192.168.200.100 as 65512 ; #103.216.40.4 as 65512;
+  	password "11112222";
+  	import filter ps_test1_v4_as65512_in;
+  	export filter ps_test1_v4_as65512_out;
+}

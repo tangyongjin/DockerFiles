@@ -1,0 +1,10 @@
+FROM ubuntu.featured
+ENV DEBIAN_FRONTEND noninteractive
+#ADD sources.list  /etc/apt/sources.list
+RUN apt-get -qq update   && apt-get -y install expect  mysql-client  curl telnet  && mkdir -p /opt/batchjob && mkdir -p /opt/batchjob/done && mkdir -p /opt/batchjob/log
+ADD *.exp /usr/local/bin/
+ADD *.sh  /usr/local/bin/
+RUN echo 'export PS1="[\u@batchjob ] \W#"' >> /root/.bashrc
+
+WORKDIR /opt/batchjob
+ENTRYPOINT ["/usr/local/bin/infinity.sh"]

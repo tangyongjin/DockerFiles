@@ -1,0 +1,7 @@
+# Ignore KDE files 
+.directory
+*.tar
+*.war
+*.zip
+*.sql
+

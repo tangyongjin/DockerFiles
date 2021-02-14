@@ -1,0 +1,27 @@
+2017-07-22 17:10:45,730 CRIT Supervisor running as root (no user in config file)
+2017-07-22 17:10:45,731 INFO supervisord started with pid 16789
+2017-07-22 17:10:46,733 INFO spawned: 'sflow-receiver' with pid 16796
+2017-07-22 17:10:47,735 INFO success: sflow-receiver entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2017-07-22 17:11:12,283 WARN received SIGHUP indicating restart request
+2017-07-22 17:11:12,283 INFO waiting for sflow-receiver to die
+2017-07-22 17:11:12,283 INFO stopped: sflow-receiver (terminated by SIGTERM)
+2017-07-22 17:11:12,283 WARN received SIGHUP indicating restart request
+2017-07-22 17:11:12,287 CRIT Supervisor running as root (no user in config file)
+2017-07-22 17:11:12,288 INFO supervisord started with pid 16789
+2017-07-22 17:11:13,290 INFO spawned: 'sflow-receiver' with pid 16913
+2017-07-22 17:11:14,291 INFO success: sflow-receiver entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2017-07-22 17:18:53,547 INFO exited: sflow-receiver (terminated by SIGTERM; not expected)
+2017-07-22 17:18:54,550 INFO spawned: 'sflow-receiver' with pid 19210
+2017-07-22 17:18:55,551 INFO success: sflow-receiver entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2017-07-22 17:18:59,783 INFO exited: sflow-receiver (terminated by SIGTERM; not expected)
+2017-07-22 17:19:00,786 INFO spawned: 'sflow-receiver' with pid 19230
+2017-07-22 17:19:01,787 INFO success: sflow-receiver entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2017-07-22 17:20:12,466 INFO exited: sflow-receiver (terminated by SIGTERM; not expected)
+2017-07-22 17:20:13,469 INFO spawned: 'sflow-receiver' with pid 19551
+2017-07-22 17:20:14,470 INFO success: sflow-receiver entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2017-07-22 17:20:27,147 INFO exited: sflow-receiver (terminated by SIGTERM; not expected)
+2017-07-22 17:20:28,150 INFO spawned: 'sflow-receiver' with pid 19943
+2017-07-22 17:20:29,151 INFO success: sflow-receiver entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2017-07-22 17:21:07,567 WARN received SIGTERM indicating exit request
+2017-07-22 17:21:07,567 INFO waiting for sflow-receiver to die
+2017-07-22 17:21:07,567 INFO stopped: sflow-receiver (terminated by SIGTERM)

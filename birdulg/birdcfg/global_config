@@ -1,0 +1,108 @@
+###
+### Bird common conf options 
+###
+
+### Define logfile
+log "/usr/local/etc/all.log" all;
+log syslog all;
+
+### turn on debug level logging, lots of lines but detailed data
+debug protocols all;
+
+### Set the local AS, used for any BGP session
+define myas = 63602;
+
+
+listen bgp address 0.0.0.0 port 179;
+
+
+### Scan system interface devices
+protocol device { scan time 30; 
+        primary "enp31s0" 103.216.41.1;
+                }
+
+
+# ### Don't grab kernel routes, not needed
+protocol kernel {
+       export all;
+       scan time 15;
+}
+
+# protocol direct {
+# 		interface "enp31s0";
+# }
+
+# watchdog warning 5 s;
+# watchdog timeout 30 s;
+
+### This function excludes networks which should *never* appear on the public internet
+### rfc1918, rfc6598, rfc6890, class D, class E, too long and too short prefixes 
+### https://www.iana.org/assignments/iana-ipv4-special-registry/iana-ipv4-special-registry.xml
+function in_martians()
+prefix set martians;
+{
+	martians = [ 
+		0.0.0.0/8+,
+		10.0.0.0/8+,			#RFC 1918
+		100.64.0.0/10+,			#RFC 6598
+		127.0.0.0/8+,			#Localhost
+		169.254.0.0/16+, 		#
+		172.16.0.0/12+,			#RFC 1918
+		192.0.0.0/24+,
+		192.0.2.0/24+, 
+		192.168.0.0/16+,		#RFC 1918
+		198.18.0.0/15+,
+		198.51.100.0/24+,
+		203.0.113.0/24+,
+		224.0.0.0/4+, 			# TYPE D
+		240.0.0.0/4+, 			# TYPE E
+		0.0.0.0/0				# default route
+#		0.0.0.0/32-, 
+#		0.0.0.0/0{25,32}, 
+#		0.0.0.0/0{0,7} 
+	];
+
+	# Avoid RFC1918 and similar networks
+	return  net ~ martians ;
+
+}
+
+# function in_limit_prefix()
+# prefix set limit_prefix;
+# {
+# 	limit_prefix = [
+# 		0.0.0.0/0{25,32}, 
+# 		0.0.0.0/0{0,7}
+# 	];
+# 	# limit prefix /8 -- /24
+# 	return net ~ limit_prefix ;
+# }
+
+
+function in_cnix_route()
+prefix set cnix_routes;
+{
+	cnix_routes =[103.216.40.0/22+, 157.119.172.0/22+, 114.113.88.0/23+ ];
+	return net ~ cnix_routes ;
+}
+
+
+
+###
+### PEERS Protocol template, used by all CNIX member peers
+template bgp PEERS {
+	local as myas;
+	keepalive time 30;
+	# table master;
+	hold time 90;
+    connect delay time 5;
+	import all;
+	export all;
+	# oute limit depricated in bird 1.6.3
+	#	route limit
+	import limit 12000;
+	source address 103.216.41.1;
+	#rs client;
+	# passive;
+	import keep filtered;
+}

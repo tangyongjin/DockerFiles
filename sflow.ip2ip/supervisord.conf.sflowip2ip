@@ -1,0 +1,21 @@
+[supervisord]
+nodaemon=true
+
+
+
+[program:rrdcached]
+priority=1003
+command = rrdcached  -g  -l /var/run/rrdcached.sock  
+startsecs=100
+autorestart=false
+startretries=10
+
+
+[program:ip2ip]
+priority=1006
+command =/usr/local/bin/sflow-ip2ip-handler
+startsecs=100
+autorestart=false
+startretries=10
+
+

@@ -1,0 +1,14 @@
+FROM ubuntu.featured
+# Setup environment
+ENV DEBIAN_FRONTEND noninteractive
+
+    
+RUN apt-get -qq update && apt-get install -y  libconfig-general-perl libnetaddr-ip-perl mrtg
+
+### set mrtg ###
+ADD ubuntu-mrtg-initd /etc/init.d/mrtg
+ADD bgpq3_0.1.31-1_amd64.deb /tmp
+RUN dpkg -i /tmp/bgpq3_0.1.31-1_amd64.deb
+RUN mkdir -p /etc/mrtg
+RUN echo 'export PS1="[\u@mrtg] \W#"' >> /root/.bashrc
+ENTRYPOINT /etc/init.d/mrtg start && bash

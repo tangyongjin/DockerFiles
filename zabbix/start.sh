@@ -1,0 +1,1 @@
+docker run -d     --name zabbix -p 8080:80 -p 10051:10051 -p 10052:10052 -p 154:154/udp -p 162:162/udp -p 514:514/udp    -v /etc/localtime:/etc/localtime:ro     --env="ZS_DBHost=172.18.0.3"     --env="ZS_DBUser=root"     --env="ZS_DBPassword=cnix@1234"     --env="XXL_zapix=true"     --env="XXL_grapher=true"     ixp.zabbix.good

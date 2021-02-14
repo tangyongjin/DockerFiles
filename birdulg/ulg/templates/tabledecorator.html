@@ -1,0 +1,38 @@
+<div id="resultbody" xmlns="http://www.w3.org/1999/xhtml" xmlns:py="http://genshi.edgewall.org/">
+  <py:if test="defined('table_headline') and (table_headline)">
+    <h3>${table_headline}</h3>
+  </py:if>
+  <py:if test="defined('before') and (before)">
+    ${before}
+  </py:if>
+  <py:if test="defined('table_header') and defined('table') and len(table_header) > 0 and len(table) > 0">
+    <table border="1">
+      <tr>
+	<py:for each="thidx,th in enumerate(table_header)">
+	  <th class="col${thidx}">${th}</th>
+	</py:for>
+      </tr>
+      <py:for each="tridx,tr in enumerate(table)">
+        <py:choose>
+	  <py:when test="(tridx % 2) == 1">
+	    <tr class="even">
+	      <py:for each="tdidx,td in enumerate(tr)">
+		<td class="col${tdidx} ${td[1]}">${td[0]}</td>
+	      </py:for>
+	    </tr>
+	  </py:when>
+	  <py:otherwise>
+	    <tr class="odd">
+	      <py:for each="tdidx,td in enumerate(tr)">
+		<td class="col${tdidx} ${td[1]}">${td[0]}</td>
+	      </py:for>
+	     </tr>
+	  </py:otherwise>
+	</py:choose>
+      </py:for>
+    </table>
+  </py:if>
+  <py:if test="defined('after') and (after)">
+    ${after}
+  </py:if>
+</div>

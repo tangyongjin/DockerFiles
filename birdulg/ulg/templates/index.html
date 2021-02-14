@@ -1,0 +1,234 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:py="http://genshi.edgewall.org/">
+  <head>
+    <title>CNIX Looking Glass</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <link rel="stylesheet" href="style.css" />
+    <!-- <link rel="stylesheet" href="nixcz.css" /> -->
+<script type="text/javascript">var NREUMQ=NREUMQ||[];NREUMQ.push(["mark","firstbyte",new Date().getTime()]);</script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+
+    <py:if test="defined('refresh')">
+      <meta http-equiv="refresh" content="$refresh" py:if="defined('refresh') and (refresh>0)" />
+    </py:if>
+    <script type="text/javascript" src="tinybox.js"></script>
+    <script type="text/javascript">
+      function updateFormParams()
+      {
+        var rs=document.getElementById("routerselect");
+        var cs=document.getElementById("commandselect");
+
+      <py:for each="cp in commonparams.keys()">
+	var commondict_${cp} = ' \
+	<py:for each="paridx,partuple in enumerate(commonparams[cp].getOptions())">
+	  <option value="${partuple[0]}"> ${partuple[1]} </option> \
+	</py:for>
+	';
+      </py:for>
+
+      <py:for each="ridx,router in enumerate(routers)">
+	<py:for each="cidx,cmd in enumerate(routers[ridx].listCommands())">
+<![CDATA[        if((rs.options[rs.selectedIndex].value==$ridx) && (cs.options[cs.selectedIndex].value==$cidx)) { ]]>
+
+            document.getElementById("paramsect").innerHTML=' \
+            <py:for each="pidx,param in enumerate(routers[ridx].listCommands()[cidx].getParamSpecs())">
+	        <fieldset> \
+		<label for="param${pidx}"> \
+		  ${pidx+3}. ${param.getName()}: \
+		</label> \
+		<py:choose>
+		  <py:when test="param.getType() == 'commonselect'">
+		    <select style="height:30px;" name="param${pidx}" id="param${pidx}"> \
+		      ' + commondict_${param.getID()} + ' \
+		    </select> \
+		  </py:when>
+		  <py:when test="param.getType() == 'select'">
+		    <select name="param${pidx}" id="param${pidx}"> \
+		      <py:for each="paridx,partuple in enumerate(param.getOptions())">
+			<option value="${partuple[0]}"> \
+			  ${partuple[1]} \
+			</option> \
+		      </py:for>
+		    </select> \
+		  </py:when>
+		  <py:otherwise>
+		      <py:choose>
+			<py:when test="default_routerid == ridx and default_commandid == cidx and defined('default_params') and pidx &lt; len(default_params)">
+	  <input type="text" name="param${pidx}" id="param${pidx}" value="${default_params[pidx]}" onfocus="this.className=\'hover\'" onblur="this.className=\'out\'" /> \
+			</py:when>
+			<py:otherwise>
+	 <input type="text" name="param${pidx}" id="param${pidx}" value="${param.getDefault()}" onfocus="this.className=\'hover\'" onblur="this.className=\'out\'" /> \
+			</py:otherwise>
+		      </py:choose>
+		  </py:otherwise>
+		</py:choose>
+                </fieldset> \
+	    </py:for>';
+
+	    <py:for each="pidx,param in enumerate(routers[ridx].listCommands()[cidx].getParamSpecs())">
+	      <py:choose>
+		<py:when test="(param.getType() == 'select') or (param.getType() == 'commonselect')">
+		  <py:for each="paridx,partuple in enumerate(param.getOptions())">
+		    <py:choose>
+		      <py:when test="default_routerid == ridx and default_commandid == cidx and defined('default_params') and partuple[0] == default_params[pidx]">
+			document.getElementById("param${pidx}").selectedIndex=${paridx};
+		      </py:when>
+		      <py:when test="partuple[0] == param.getDefault()">
+			document.getElementById("param${pidx}").selectedIndex=${paridx};
+		      </py:when>
+		    </py:choose>
+		  </py:for>
+		</py:when>
+	      </py:choose>
+	    </py:for>
+	    }
+	</py:for>
+      </py:for>
+      }
+
+      function updateFormCommands()
+      {
+        var rs=document.getElementById("routerselect");
+      <py:for each="ridx,router in enumerate(routers)">
+	if(rs.options[rs.selectedIndex].value==$ridx) {
+	document.getElementById("commandselect").innerHTML=' \
+	<py:for each="cidx,cmd in enumerate(routers[ridx].listCommands())">
+	  <py:choose>
+	    <py:when test="default_routerid == ridx and default_commandid == cidx">
+	      <option value="$cidx" selected="selected">${cmd.getName()}</option> \
+	    </py:when>
+	    <py:otherwise>
+	      <option value="$cidx">${cmd.getName()}</option> \
+	    </py:otherwise>
+	  </py:choose>
+	</py:for>';
+	}
+      </py:for>
+
+        updateFormParams()
+      }
+    </script>
+
+  </head>
+  <body class="index">
+    <script>
+      window.onload=updateFormCommands; 
+    </script>
+    <div id="wrapper">
+    <div id="header">
+      <py:choose>
+	<py:when test="defaults.header">
+	  <h1>CNIX - $defaults.header</h1>
+	</py:when>
+	<py:otherwise>
+	  <h1>CNIX</h1>
+	</py:otherwise>
+      </py:choose>
+    </div>
+    <p>Select router to perform operation on, then select a command to perform and add (optional) argument if needed.</p>
+    <form action="${getFormURL()}" method="post">
+      <input type="hidden" name="sessionid" value="$default_sessionid" py:if="defined('default_sessionid') and (default_sessionid)" />
+      <input type="hidden" name="resrange" value="$resrange" py:if="defined('resrange')" />
+
+
+<div class="form">
+<fieldset>
+  <legend></legend>
+      <label  for="routerselect">1. RS select:</label>
+      <select style="height: 30px;" id="routerselect" name="routerid" onchange="updateFormCommands()">
+	<py:for each="ridx,rtr in enumerate(routers)">
+          <py:if test="rtr.checkACL(user)">
+	    <py:choose>
+	      <py:when test="ridx == default_routerid">
+		<option value="$ridx" selected="selected">
+		  ${rtr.getName()}
+		</option>
+	      </py:when>
+	      <py:otherwise>
+		<option value="$ridx">
+		  ${rtr.getName()}
+		</option>
+	      </py:otherwise>
+	    </py:choose>
+          </py:if>
+	</py:for>
+      </select>
+
+</fieldset>
+<fieldset>
+
+
+	    <label for="commandselect">2. Command selection:</label> 
+	      <select  style="height: 30px;" id="commandselect" name="commandid" onchange="updateFormParams()">
+	      </select>
+
+</fieldset>
+
+	<div  style="height:30xp;" id="paramsect"> <!-- TODO: change dynamic display -->
+	</div>
+
+<fieldset id="submit-">
+<label>&nbsp;</label> 
+              <input style="height:30px;" type="submit" value="Submit" />
+</fieldset>
+</div>
+    </form>
+<div class="clear"></div>
+    <py:choose>
+      <py:when test="defined('result') or defined('refresh')">
+	<div id="result">
+	  <py:choose>
+	    <py:when test="defined('result') and result">
+	      ${result}
+	    </py:when>
+	    <py:otherwise>
+	    </py:otherwise>
+	  </py:choose>
+	  <p py:if="defined('refresh') and (refresh>0)">
+	    <div style="width:100%; text-align:center">
+              <img src="images/preload.gif" align="middle" width="48" height="35" alt="Loading..." />
+	    </div>
+	    <br/>
+	    <em>The page is going to be refreshed in $refresh seconds.</em>
+	  </p>
+	</div>
+	<div id="range">
+	  <py:if test="defined('resrangeb') and resrangeb">
+	    <br/>
+	    <p> [
+	      <py:for each="rb in resrangeb[:-1]">
+		<py:choose>
+		  <py:when test="rb[1]">
+		    <a href="${rb[1]}">${rb[0]}</a> | 
+		  </py:when>
+		  <py:otherwise>
+		    ${rb[0]} | 
+		  </py:otherwise>
+		</py:choose>
+	      </py:for>
+	      <py:choose>
+		<py:when test="resrangeb[-1][1]">
+		  <a href="${resrangeb[-1][1]}">${resrangeb[-1][0]}</a> ]
+		</py:when>
+		<py:otherwise>
+		  ${resrangeb[-1][0]} ]
+		</py:otherwise>
+	      </py:choose>
+	    </p>
+	  </py:if>
+	</div>
+      </py:when>
+    </py:choose>
+<div class="push"></div>
+    </div>
+    <div id="footer">
+      <div class="logos">
+	<!-- <a href="http://www.nic.cz/"><img src="images/cznic-logo-bila.png" width="108" height="38" alt="CZ.NIC" /></a> -->
+        <!-- <a href="http://www.nix.cz/"><img src="images/nixcz-logo-bila.png" width="78" height="38" alt="NIX CZ" /></a> -->
+      </div>
+      <p class="legales"><small>&copy; 2016-2017 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; CNIX-NOC &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;   </small></p>
+    </div>
+  </body>
+</html>

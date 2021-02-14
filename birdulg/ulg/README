@@ -1,0 +1,52 @@
+ULG version 0.9
+- development started in June 2012
+- sponsored by CZ.NIC (http://www.nic.cz)
+- intention is to create a versatile Looking Glass for various routers
+- genshi and cherrypy was used in the beginning
+- cherrypy was later dropped and simple CGI was used instead
+- the CGI scripts currently do not support mod_python nor mod_wsgi
+
+Basic instalation procedure is:
+
+1) install prerequisites: Python 2.6 or 2.7, Genshi, Python CGI module, urllib,
+   pexpect and pygraph and GraphViz
+2) instal additional router-specific prerequisities:
+ - JuniperRouterRemoteTelnet: Telnet
+ - CiscoRouter: OpenSSH client
+ - BirdRouterRemote: OpenSSH client (default)
+3) deploy files in src directory to some place in WWW tree
+4) mkdir /etc/ulg; cp config.py.example /etc/ulg/config.py
+5) edit config.py to set up routers and credentials
+6) edit defaults.py to set up correct paths toward bins
+7) create .htaccess file with following contents:
+
+<FilesMatch "(.pyc|.*~)">
+  Deny from all
+</FilesMatch>
+
+Options +ExecCGI
+AddHandler cgi-script .py
+
+(Or use corresponding config of your web server.)
+
+7) access http://yourserver/path-to-ulg/ulg.py via browser
+8) change strings and templates in defaults.py and templates/*.html .
+
+Procedure for Debian Squeeze/Wheezy and Linux Mint 14 (nadia):
+1)
+apt-get install python python-pexpect python-pygraph python-genshi libgv-python whois
+
+All other steps are the same as in generic case.
+
+
+Contacts:
+
+* Author: tmshlvck@gmail.com or tomas.hlavacek@nic.cz
+* GIT hub https://github.com/tmshlvck/ulg
+* CZ.NIC Git: git://git.nic.cz/ulg.git
+
+
+Future plans:
+
+This "pre-release" is only a preview and "technology demonstrator". Requests and contributions are welcomed. I indend to support BIRD (http://bird.network.cz) and Cisco routers and switches and support typical BGP-related commands and also IGP and L2 management commands in order to make LG more useful for ordinary NOC staff especially for information aquisition during outages and problems.
+

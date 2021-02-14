@@ -1,0 +1,48 @@
+FROM ubuntu.featured
+ENV DEBIAN_FRONTEND noninteractive
+#ADD sources.list  /etc/apt/sources.list
+RUN apt-get -qq update   &&  apt-get install -y rsync git rrdtool rrdcached autoconf  gcc make mrtg \
+libdaemon-control-perl \
+librrds-perl \
+libdbi-perl \
+libdbd-mysql-perl \
+libconfig-general-perl \
+libnetaddr-ip-perl \
+libnetpacket-perl \
+libnet-snmp-perl \
+librrds-perl \
+libtemplate-perl \
+liberror-perl \
+ssh \
+supervisor &&  rm -rf /var/lib/apt/lists/*
+
+
+RUN mkdir /var/run/sshd
+RUN echo 'root:cnix@1234' | chpasswd
+RUN sed -i 's/PermitRootLogin without-password/PermitRootLogin yes/' /etc/ssh/sshd_config
+
+RUN git clone  https://github.com/sflow/sflowtool.git /tmp/sflowtool
+WORKDIR /tmp/sflowtool
+RUN ./boot.sh && ./configure && make && make install
+
+RUN  mkdir -p /opt/ixpmanager/tools/perl-lib/IXPManager
+WORKDIR /opt/ixpmanager/tools/perl-lib/IXPManager
+ADD ./IXPManager  /opt/ixpmanager/tools/perl-lib/IXPManager
+RUN perl Makefile.PL && make install
+
+COPY MyConfig.pm /root/.cpan/CPAN/MyConfig.pm
+RUN cpan  Config::General
+RUN cpan Crypt::DES Crypt::Rijndael Digest::SHA1  && echo 'export PS1="[\u@sflow] \W#"' >> /root/.bashrc
+COPY ixpmanager.conf /usr/local/etc/ixpmanager.conf
+
+ADD ixp-cron /etc/cron.d/ixp-cron
+RUN rm -fr /etc/cron.d/mrtg
+
+ADD perltool/*   /usr/local/bin/
+ADD update-l2database-v2c.pl  /usr/local/bin/update-l2database.pl
+RUN chmod 0644 /etc/cron.d/ixp-cron  && touch /var/log/cron.log  && rm -fr /var/run/rrdcached.sock
+
+EXPOSE 6343 
+EXPOSE 22
+COPY supervisord.conf.sflow /etc/supervisor/conf.d/supervisord.conf
+CMD ["/usr/bin/supervisord","-c","/etc/supervisor/conf.d/supervisord.conf"]

@@ -1,0 +1,123 @@
+#!/usr/bin/perl -w
+
+use warnings;
+use strict;
+use Getopt::Long;
+use Data::Dumper;
+use DBI;
+use Perl6::Say; 
+use Time::HiRes qw(ualarm gettimeofday tv_interval);
+
+
+
+my $dbh = DBI->connect('dbi:mysql:database=ixp2;host=172.18.0.2','root','cnix@1234',{AutoCommit=>1,RaiseError=>1,PrintError=>0});
+print "2+2=",$dbh->selectrow_array("SELECT * from user"),"\n";
+
+
+my $mactable = reload_mactable($dbh);
+my $matrix = matrix_init($dbh);
+
+
+
+my $city;
+
+
+my $ip1="12.0.0.1";
+
+
+$city->{beijing}=010;
+$city->{tianjin}->{areacode}=022;
+
+my $key ='nanjing';
+
+
+if (exists  $city->{$key} ) {
+   $city->{nanjing}->{areacode}=025;
+} else {
+   $city->{nanjing}->{areacode}="new025";
+}
+
+
+
+
+$city->{tianjin}->{$ip1}=900;
+
+
+print Dumper($mactable);
+
+die;
+
+
+sub matrix_init
+{
+	my ($dbh) = @_;
+	my ($sth, $matrix);
+
+
+	my $query = "
+SELECT DISTINCT
+	vli.vlaninterfaceid,
+	vli.virtualinterfaceid,
+	vli.vlan,
+	cu.name
+FROM
+	(view_vlaninterface_details_by_custid vli, cust cu)
+WHERE
+	vli.custid = cu.id 
+	  
+ORDER BY
+	virtualinterfaceid
+";
+
+	($sth = $dbh->prepare($query)) or die "$dbh->errstr\n";
+	$sth->execute() or die "$dbh->errstr\n";
+
+	while (my $rec = $sth->fetchrow_hashref) {
+		# mapping from virtualinterfaceid->vlaninterfaceid
+		$matrix->{vlanmap}->{$rec->{vlan}}->{$rec->{virtualinterfaceid}} = $rec->{vlaninterfaceid};
+		# mapping from virtualinterfaceid->name
+		$matrix->{names}->{$rec->{vlaninterfaceid}} = $rec->{name};
+		$matrix->{vlilist}->{$rec->{vlan}}->{$rec->{vlaninterfaceid}} = 1;
+	}
+
+
+
+	foreach my $ipprotocol (qw(4 6)) {
+		foreach my $rrdtype (qw(bytes pkts)) {
+			foreach my $vlan (keys %{$matrix->{vlilist}}) {
+				foreach my $srcvli (keys %{$matrix->{vlilist}->{$vlan}}) {
+					foreach my $dstvli (keys %{$matrix->{vlilist}->{$vlan}}) {
+						next if ($srcvli == $dstvli);
+						$matrix->{p2p}->{$ipprotocol}->{$rrdtype}->{$dstvli}->{$srcvli} = 0;
+					}
+					$matrix->{individual}->{$ipprotocol}->{$rrdtype}->{$srcvli}->{in} = 0;
+					$matrix->{individual}->{$ipprotocol}->{$rrdtype}->{$srcvli}->{out} = 0;
+				}
+				$matrix->{aggregate}->{$ipprotocol}->{$rrdtype}->{$vlan}->{in}  = 0;
+				$matrix->{aggregate}->{$ipprotocol}->{$rrdtype}->{$vlan}->{out} = 0;
+			}
+		}
+	}
+
+	return $matrix;
+}
+
+
+sub reload_mactable
+{
+	my ($dbh) = @_;
+	my ($sth, $pmactable);
+
+	my $query = "select mac from macaddress ";
+
+
+	($sth = $dbh->prepare($query)) or die "$dbh->errstr\n";
+	$sth->execute() or die "$dbh->errstr\n";
+	while (my $rec = $sth->fetchrow_hashref) {
+
+		# push (@{$pmactable->{mac}->{$rec->{mac}}}, $rec->{id});
+	}
+
+	my $mac;
+	return $pmactable;
+}

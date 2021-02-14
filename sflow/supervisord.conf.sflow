@@ -1,0 +1,49 @@
+[supervisord]
+nodaemon=true
+
+
+[program:sflow-receiver]
+#command =/usr/local/bin/sflowtool  -p 6343 -l -f 127.0.0.1/5500   -f 127.0.0.1/5502
+command =/usr/local/bin/sflowtool  -p 6343 -l -f 127.0.0.1/5500 -f 127.0.0.1/5501   -f 127.0.0.1/5502
+autorestart=false
+
+[program:rrdcached]
+priority=1003
+command = rrdcached  -g  -l /var/run/rrdcached.sock  
+startsecs=100
+autorestart=false
+startretries=10
+
+
+
+[program:sflow-to-rrd]
+priority=1004
+command =/usr/local/bin/sflow-to-rrd-handler
+startsecs=100
+autorestart=true
+startretries=10
+
+[program:sflow-dongxi]
+priority=1005
+command =/usr/local/bin/sflow-dongxi-handler
+startsecs=100
+autorestart=true
+startretries=10
+
+
+
+
+
+[program:pool]
+priority=1006
+command =/usr/local/bin/sflow-ip2ip-handler
+startsecs=100
+autorestart=false
+startretries=10
+
+[program:sshd]
+priority=1009
+command =/usr/sbin/sshd
+startsecs=100
+autorestart=true
+

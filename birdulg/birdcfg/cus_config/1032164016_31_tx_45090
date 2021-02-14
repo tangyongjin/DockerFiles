@@ -1,0 +1,191 @@
+###
+###AS 45090 - tencent
+###
+
+### Define inbound filter
+filter tx_45090_in
+    int  cus_as;
+    int  alibaba_as;									#0:37963
+    int  tianxiangruiyi_as;						#0:63625
+    pair prepend_aspath_1X;           #11:as
+    pair prepend_aspath_2X;           #12:as
+    pair prepend_aspath_3X;           #13:as
+    pair send_all_1_63602;            #1:63602
+    pair deny_all_0_63602;            #0:63602
+    pair alibaba_0_37963;             #0:37963
+    pair tianxiangruiyi_0_63625;      #0:63625
+
+  {
+    cus_as = 45090;
+    send_all_1_63602=( 1,myas );
+    deny_all_0_63602 = ( 0,myas );
+    prepend_aspath_1X=( 11,cus_as );
+    prepend_aspath_2X=( 12,cus_as );
+    prepend_aspath_3X=( 13,cus_as );
+    alibaba_as=37963;
+    tianxiangruiyi_as=63625;
+    alibaba_0_37963= ( 0,alibaba_as );
+    tianxiangruiyi_0_63625= ( 0,tianxiangruiyi_as );   
+
+    # reject martians && cnix_route
+      if (( in_martians() ) || ( in_cnix_route() )) then {
+        reject;
+         }
+
+    # accept deny_all_0_63602
+      if (( deny_all_0_63602  ~  bgp_community )  && ( net ~ [0.0.0.0/0{8,24}] ))  then {
+        bgp_community = -empty-; 
+        bgp_community = add(bgp_community,(65535, 65282));   #no-advertise
+        accept;
+         }
+    # accept cnix ddos BNH=103.216.40.66
+      if ((bgp_path.last = cus_as) && ( bgp_next_hop = 103.216.40.66 ) && ( net ~ [0.0.0.0/0{32,32}]))  then {
+        bgp_community.add(send_all_1_63602);
+        accept;
+      }
+
+    # accept as-path prepend 1x
+      if ((bgp_path.last = cus_as) && ( prepend_aspath_1X ~  bgp_community ) && ( net ~ [0.0.0.0/0{8,24}] )) then {
+        bgp_path.prepend(cus_as);
+        bgp_community.add(send_all_1_63602);
+        accept;
+         }
+    # accept as-path prepend 2x
+      if ((bgp_path.last = cus_as) && ( prepend_aspath_2X ~  bgp_community ) && ( net ~ [0.0.0.0/0{8,24}] ))  then {
+        bgp_path.prepend(cus_as);
+        bgp_path.prepend(cus_as);
+        bgp_community.add(send_all_1_63602);
+        accept;
+        }
+    # accept as-path prepend 3x
+      if ((bgp_path.last = cus_as) && ( prepend_aspath_3X ~  bgp_community ) && ( net ~ [0.0.0.0/0{8,24}] ))  then {
+        bgp_path.prepend(cus_as);
+        bgp_path.prepend(cus_as);
+        bgp_path.prepend(cus_as);
+        bgp_community.add(send_all_1_63602);
+        accept;
+         }
+    # accept send_all_1_63602
+      if ((bgp_path.last = cus_as) &&  !( send_all_1_63602 ~ bgp_community )  && ( net ~ [0.0.0.0/0{8,24}] ))  then {
+        bgp_community.add(send_all_1_63602);
+        bgp_community.add(alibaba_0_37963);
+        bgp_community.add(tianxiangruiyi_0_63625);
+        accept;
+         }
+
+    # reject default
+      reject;
+  }
+
+### Define outbound filter
+filter tx_45090_out
+    int cus_as;
+    pair deny_one_0_as;               #0:as
+    pair send_one_1_as;               #1:as
+    pair send_all_1_63602;            #1:63602
+    # pair sohu_cdn;                  #65510:10
+    # pair iqiyi_cdn;                 #65513:10
+    # pair leshi_gslb;                #58548:10
+    # pair tencent_video_gslb;        #45090:10
+    # pair weixin_gslb;               #45090:20
+    # pair cctv_gslb;                 #55957:10
+    # pair xunlei_yiantianxia_gslb;   #45093:10
+    # pair fenghuang_cpsp_gslb;       #24133:3312
+    # pair youku_youchi_gslb;         #59060:1001
+  {
+    cus_as = 45090;
+    send_one_1_as = ( 1,cus_as );
+    deny_one_0_as = ( 0,cus_as );
+    send_all_1_63602 = ( 1,myas );
+    # sohu_cdn = ( 65510,10 );
+    # iqiyi_cdn = ( 65513,10 );
+    # leshi_gslb = ( 58548,10 );
+    # tencent_video_gslb = ( 45090,10 );
+    # weixin_gslb = ( 45090,20 );
+    # cctv_gslb = ( 55957,10 );
+    # xunlei_yiantianxia_gslb = ( 45093,10 );
+    # fenghuang_cpsp_gslb = ( 24133,3312 );
+    # youku_youchi_gslb = ( 59060,1001 );
+
+    # reject appoint community
+      if ( deny_one_0_as ~ bgp_community ) then {
+         bgp_community.empty;
+         accept;
+        }
+    # advertise cnix route
+      if (in_cnix_route()) then {
+        accept;
+          }
+    # accept appoint community 1:as
+      if ( send_one_1_as ~ bgp_community ) then {
+        accept;
+          }
+    # accept cnix ddos BNH=103.216.40.66
+      if (( bgp_next_hop = 103.216.40.66 ) && ( net ~ [0.0.0.0/0{32,32}] ))  then {
+        accept;
+          }
+    # # accept sohu_cdn
+    #   if ( sohu_cdn ~ bgp_community )  then {
+    #       accept;
+    #       }
+    # # accept iqiyi_cdn
+    #   if ( iqiyi_cdn ~ bgp_community ) then {
+    #       accept;
+    #       }
+    # # accept leshi_gslb
+    #   if ( leshi_gslb ~ bgp_community ) then {
+    #       accept;
+    #       }
+    # # accept tencent_video_gslb
+    #   if ( tencent_video_gslb ~ bgp_community ) then {
+    #       accept;
+    #       }
+    # # accept weixin_gslb
+    #   if ( weixin_gslb ~ bgp_community ) then {
+    #       accept;
+    #       }
+    # # accept cctv_gslb
+    #   if ( cctv_gslb ~ bgp_community ) then {
+    #       accept;
+    #       }
+    # # accept xunlei_yiantianxia_gslb
+    #   if ( xunlei_yiantianxia_gslb ~ bgp_community ) then {
+    #       accept;
+    #       }
+    # # accept fenghuang_cpsp_gslb
+    #   if ( fenghuang_cpsp_gslb ~ bgp_community ) then {
+    #       accept;
+    #       }
+    # # accept youku_youchi_gslb
+    #   if ( youku_youchi_gslb ~ bgp_community )  then {
+    #       accept;
+    #       }
+    # accept send all 1:63602
+      if ( send_all_1_63602 ~ bgp_community ) then {
+        accept;
+          }
+    # reject martians
+      if  (in_martians()) then {
+        reject;
+          }
+    # reject default
+      reject;
+  }
+### Define protocol  2017-06-01 - jason yang
+  protocol bgp tx1_45090 from PEERS
+  {
+    description "tencent";
+    neighbor 103.216.40.16 as 45090;
+    password "aq0hmdyq";
+    import filter tx_45090_in;
+    export filter tx_45090_out;
+  }
+  protocol bgp tx2_45090 from PEERS
+  {
+    description "tencent";
+    neighbor 103.216.40.31 as 45090;
+    password "x52ao3tx";
+    import filter tx_45090_in;
+    export filter tx_45090_out;
+  }
+

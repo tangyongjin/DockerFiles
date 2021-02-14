@@ -1,0 +1,79 @@
+FROM ubuntu:14.04
+MAINTAINER Nicholas Istre <nicholas.istre@e-hps.com>
+
+# Setup environment
+ENV DEBIAN_FRONTEND noninteractive
+
+# Update sources
+
+
+
+ADD sources.list  /etc/apt/sources.list
+
+RUN apt-get update -y
+
+# install http
+RUN apt-get install -y apache2 vim bash-completion unzip
+RUN mkdir -p /var/lock/apache2 /var/run/apache2
+
+# install mysql
+RUN apt-get install -y mysql-client mysql-server
+#RUN echo "NETWORKING=yes" > /etc/sysconfig/network
+# start mysqld to create initial tables
+#RUN service mysqld start
+
+# install php
+RUN apt-get install -y php5 php5-mysql php5-dev php5-gd php5-memcache php5-pspell php5-snmp snmp php5-xmlrpc libapache2-mod-php5 php5-cli
+#RUN yum install -y php php-mysql php-devel php-gd php-pecl-memcache php-pspell php-snmp php-xmlrpc php-xml
+
+# install supervisord
+
+RUN apt-get install -y supervisor
+RUN mkdir -p /var/log/supervisor
+
+# install sshd
+RUN apt-get install -y openssh-server openssh-client passwd 
+RUN mkdir -p /var/run/sshd
+
+#RUN ssh-keygen -q -N "" -t dsa -f /etc/ssh/ssh_host_dsa_key && ssh-keygen -q -N "" -t rsa -f /etc/ssh/ssh_host_rsa_key 
+RUN sed -ri 's/PermitRootLogin without-password/PermitRootLogin yes/g' /etc/ssh/sshd_config
+RUN echo 'root:changeme' | chpasswd
+
+# Put your own public key at id_rsa.pub for key-based login.
+RUN mkdir -p /root/.ssh && touch /root/.ssh/authorized_keys && chmod 700 /root/.ssh
+#ADD id_rsa.pub /root/.ssh/authorized_keys
+
+
+
+############## For ixp ###########
+RUN  apt-get clean &&  apt-get install -y libcurl3-gnutls liberror-perl rsync git rrdtool
+
+RUN mkdir -p /software
+WORKDIR /software 
+RUN git clone  https://github.com/sflow/sflowtool.git /software/sflowtool
+WORKDIR /software/sflowtool
+RUN ./boot.sh && ./configure && make && make install
+
+ADD ixp.tar /opt
+ADD ixp2.sql /software
+RUN service mysql start  &&  mysql -uroot --password=''</software/ixp2.sql  &&  service mysql stop
+
+RUN mkdir -p /opt/logs && apt-get install  -y libconfig-general-perl libdaemon-control-perl libnetaddr-ip-perl libnetpacket-perl libnet-snmp-perl mrtg librrds-perl libtemplate-perl
+ADD phpinfo.php /var/www/html/
+ADD php.ini /etc/php5/apache2/php.ini  
+## display php errors on /etc/php5/apache2/php.ini
+ADD  000-default.conf  /etc/apache2/sites-enabled/000-default.conf
+COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+RUN  a2enmod rewrite && mkdir -p ~/.cpan/CPAN
+ADD  MyConfig.pm /root/.cpan/CPAN/MyConfig.pm
+ADD  composer.phar /usr/bin/
+ADD  ixpmanager.conf /usr/local/etc
+RUN cpan Crypt::DES Crypt::Rijndael Digest::SHA1
+
+EXPOSE 22  443 3306
+
+## change  composer to chinese source gloaly
+WORKDIR /opt/ixpmanager
+RUN chmod +x /usr/bin/composer.phar && /usr/bin/composer.phar  config -g repo.packagist composer https://packagist.phpcomposer.com && cd /opt/ixpmanager/ && /usr/bin/composer.phar  -vvv update 
+
+#CMD ["/usr/bin/supervisord"]

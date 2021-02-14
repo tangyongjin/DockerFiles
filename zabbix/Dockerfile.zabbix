@@ -1,0 +1,32 @@
+FROM monitoringartist/zabbix-xxl
+ENV DEBIAN_FRONTEND noninteractive
+ADD simhei.ttf  /usr/local/src/zabbix/frontends/php/fonts/DejaVuSans.ttf
+
+ADD  golang-zabbix-robot-32   /usr/local/share/zabbix/alertscripts
+ADD  golang-zabbix-robot-64   /usr/local/share/zabbix/alertscripts
+ADD  sendmail.sh              /usr/local/share/zabbix/alertscripts
+
+
+RUN  chmod +x  /usr/local/share/zabbix/alertscripts/golang-zabbix-robot*
+RUN  chmod +x  /usr/local/share/zabbix/alertscripts/sendmail.sh
+RUN  yum -y install  mailx
+RUN  yum -y install  sendmail 
+RUN  yum -y install  dos2unix
+RUN  yum -y install  rsyslog
+RUN  yum -y install  syslog
+
+
+#make rsyslogd auto start
+ADD  rsyslogd.conf   /etc/supervisor.d
+
+
+## make rsyslogd receive log from  514/udp and save 
+#  log file to /var/log/remotef.log
+
+
+ADD  rsyslog.conf /etc/rsyslog.conf
+
+
+ADD  mail.rc /etc/mail.rc
+ADD  remotef.log /var/log/remotef.log
+RUN  chmod 777  /var/log/remotef.log

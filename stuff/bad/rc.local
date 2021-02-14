@@ -1,0 +1,7 @@
+#! /bin/bash
+ service mysql  restart
+ service memcached  restart
+ service apache2 restart
+ /usr/sbin/cron  
+ /usr/local/bin/ixp-periodic-update.sh
+ /etc/init.d/mrtg start

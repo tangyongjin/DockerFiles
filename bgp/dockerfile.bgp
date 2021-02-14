@@ -1,0 +1,47 @@
+FROM ubuntu.featured
+ENV DEBIAN_FRONTEND noninteractive
+
+RUN apt-get update && \
+    apt-get install -y tcl8.6 \
+			tcllib \
+			tcl-thread \
+			tcl-tclreadline \
+			tcl-tls \
+			tcl-trf \
+			tcl-udp \
+			tcl-vfs \
+			tclcurl \
+			tclgeoip \
+			tclodbc \
+			tclxml \
+			tdom \
+			tcl-tclex \
+			tcl-memchan \
+			tcl-combat \
+			tcl-signal \
+			tcl-sugar \
+			libpgtcl \
+			libsqlite-tcl \
+			mysqltcl \
+			tcl8.6-tdbc \
+			tcl8.6-tdbc-mysql \
+			tcl8.6-tdbc-odbc \
+			tcl8.6-tdbc-postgres \
+			tcl8.6-tdbc-sqlite3 \
+			itcl3 \
+			critcl \
+			xotcl \
+			tclxapian \
+			expect \
+                        mysql-client \
+                        curl \
+                        telnet \
+			libtcl-chiark-1 && \
+                        apt-get clean
+
+ENV TCLLIBPATH /opt/tcl /opt/tcl/lib
+ADD  infinity.sh /usr/local/bin
+ADD  blank.sh /usr/local/bin
+ADD  bgp.tcl /
+RUN echo 'export PS1="[\u@bgp] \W#"' >> /root/.bashrc
+ENTRYPOINT ["/usr/local/bin/blank.sh"]

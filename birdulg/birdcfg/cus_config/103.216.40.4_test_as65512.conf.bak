@@ -1,0 +1,99 @@
+###
+### AS65512 - CNIX  Test_switch
+### 
+###
+### Define inbound filter
+#
+filter ps_testswitch_v4_as65512_in
+	int  cus_as;
+#	int  cus_tag;
+    pair x_community;
+	pair y_community;
+
+
+	{
+		
+		print "DBG0000 >>>>>>>>>>>>>>>>>>>>>>";
+		print "DBG0001 ----------------------";  
+		print "DBG0001 prefix.len"  ;
+    	
+ 		print bgp_path.last;
+		print "DBG0002 **********************";  
+	
+
+  	# reject martians
+
+		if  (in_martians()) then {
+ 	        print net;
+			reject "reject:in_martians";
+
+		}
+  
+  	# reject cnix router
+
+    	if  (in_cnix_route()) then {
+         	   
+    	       print net;
+    		   reject "reject:in_cnix_route";
+    	    }
+
+		 cus_as = 65512;
+	# as-path prepend 1x   
+         x_community=(11,cus_as);
+         y_community=(1,myas);
+         
+      	 if ( x_community  ~   bgp_community  ) then {
+               bgp_path.prepend(cus_as);
+			   # print "DBG0005 x_community";
+		       print net;
+			   accept "DBG0005  acceot  x_community check ";
+		 }
+	# as-path prepend 2x
+         x_community=(12,cus_as);
+         y_community=(1,myas);
+         
+      	 if ( x_community  ~   bgp_community  ) then {
+               bgp_path.prepend(cus_as);
+			   # print "DBG0005 x_community";
+		       print net;
+			   accept "DBG0005  acceot  x_community check ";
+		 }
+
+         print "DBG0009 **bgp_community********************";
+
+         if ( y_community  !~   bgp_community  ) then {
+        	    
+        	    bgp_community.empty;
+                bgp_community.add(y_community);
+ 		 }
+
+
+
+
+         print bgp_community;
+         
+
+
+		reject "reject defalut reject" ;
+}
+
+### Define outbound filter
+filter ps_testswitch_v4_as65512_out
+#if (bgp_community = 1:63602) then accept;
+{
+	accept;
+}
+
+
+### Define protocol
+## 2017-03-19 - errors with bird 1.6.3
+protocol bgp R65512 from PEERS {
+  	description "eBGP - test switch";
+  	neighbor 103.216.40.4 as 65512;
+ 	#setkey 11112222;
+ 	password "11112222";
+
+
+  	import filter ps_testswitch_v4_as65512_in;
+	export filter ps_testswitch_v4_as65512_out;
+}

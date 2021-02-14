@@ -1,0 +1,31 @@
+FROM ubuntu.featured
+
+ENV DEBIAN_FRONTEND noninteractive
+
+
+RUN mkdir -p /var/lock/apache2 /var/run/apache2
+
+RUN apt-get -qq update && apt-get install -y \
+  apache2 \
+  vim  \
+  unzip \
+  php5  \
+  php5-mysql \ 
+  php5-dev \
+  php5-gd \
+  php5-memcache \ 
+  php5-pspell \
+  php5-snmp \
+  snmp \
+  php5-xmlrpc \ 
+  libapache2-mod-php5 \ 
+  php5-cli 
+
+RUN a2enmod rewrite
+
+
+RUN echo "Asia/Chongqing" > /etc/timezone
+RUN sudo dpkg-reconfigure -f noninteractive tzdata
+ADD p.php /var/www/html/p.php
+EXPOSE 22 80 443
+

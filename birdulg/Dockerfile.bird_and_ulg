@@ -1,0 +1,38 @@
+FROM ubuntu:14.04
+
+ENV DEBIAN_FRONTEND noninteractive
+RUN echo "Asia/Chongqing" > /etc/timezone
+RUN sudo dpkg-reconfigure -f noninteractive tzdata
+
+
+
+RUN apt-get update \
+  && apt-get install -y  software-properties-common python-software-properties \
+  && add-apt-repository ppa:chris-lea/libsodium \
+  && echo "deb http://ppa.launchpad.net/chris-lea/libsodium/ubuntu trusty main" >> /etc/apt/sources.list \
+  && echo "deb-src http://ppa.launchpad.net/chris-lea/libsodium/ubuntu trusty main" >> /etc/apt/sources.list \
+  && apt-get update && sudo apt-get install -y libsodium-dev \
+     apache2 cpp gcc flex bison libncurses-dev libreadline-dev make  \
+     python python-pexpect python-pygraph python-genshi libgv-python whois ssh telnet  unzip iptables  vim  snmp  traceroute
+
+
+RUN mkdir -p /var/lock/apache2 /var/run/apache2  /etc/ulg /run/bird
+ADD  000-default.conf   /etc/apache2/sites-enabled/000-default.conf
+RUN echo "HttpProtocolOptions Unsafe" >>/etc/apache2/apache2.conf
+RUN sudo a2dismod mpm_event && sudo a2enmod mpm_prefork cgi rewrite
+
+
+
+### install Bird
+ADD  bird-1.6.3.tar.gz  /tmp
+WORKDIR /tmp/bird-1.6.3
+RUN  ./configure && make  && make install 
+
+WORKDIR /tmp
+RUN  rm -fr /tmp/bird-1.6.3
+ADD  sudoers  /etc/sudoers
+
+RUN  mkdir -p /var/www/.ssh && chmod 777   /var/www/.ssh
+
+EXPOSE 80  179
+ENTRYPOINT  service apache2 start &&  bird -c /usr/local/etc/bird.conf && chmod 777 /usr/local/var/run/bird.ctl &&  bash

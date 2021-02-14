@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="US-ASCII" standalone="no"?>
+<!DOCTYPE log SYSTEM "logger.dtd">
+<log>
+<record>
+  <date>2017-07-24T07:20:10</date>
+  <millis>1500877210923</millis>
+  <sequence>1</sequence>
+  <logger>com.inmon.sflowtrend</logger>
+  <level>CONFIG</level>
+  <class>com.inmon.sflowtrend.b</class>
+  <method>s</method>
+  <thread>1</thread>
+  <message>sFlowTrend version 6.5.04, revision 4567</message>
+</record>
+<record>
+  <date>2017-07-24T07:20:10</date>
+  <millis>1500877210923</millis>
+  <sequence>2</sequence>
+  <logger>com.inmon.sflowtrend</logger>
+  <level>CONFIG</level>
+  <class>com.inmon.sflowtrend.b</class>
+  <method>s</method>
+  <thread>1</thread>
+  <message>Java: Oracle Corporation 1.7.0_121
+OS: Linux 3.10.0-514.6.1.el7.x86_64 amd64
+Free mem: 987233400, max mem: 1908932608</message>
+</record>
+<record>
+  <date>2017-07-24T07:20:11</date>
+  <millis>1500877211203</millis>
+  <sequence>3</sequence>
+  <logger>com.inmon.sflowtrend.server</logger>
+  <level>WARNING</level>
+  <class>com.inmon.sflowtrend.f.d</class>
+  <method>x</method>
+  <thread>1</thread>
+  <message>LicenseManager.loadLicense: exception loading license: java.io.FileNotFoundException: /var/local/sflowtrend-pro/license.prp (No such file or directory)</message>
+</record>
+<record>
+  <date>2017-07-24T07:20:11</date>
+  <millis>1500877211205</millis>
+  <sequence>4</sequence>
+  <logger>com.inmon.sflowtrend.server</logger>
+  <level>SEVERE</level>
+  <class>com.inmon.sflowtrend.f.d</class>
+  <method>c</method>
+  <thread>1</thread>
+  <message>LicenseManager.loadLicense: license exception: License not yet configured (License not configured), status = notConfigured</message>
+</record>
+<record>
+  <date>2017-07-24T07:20:11</date>
+  <millis>1500877211206</millis>
+  <sequence>5</sequence>
+  <logger>com.inmon.sflowtrend</logger>
+  <level>CONFIG</level>
+  <class>com.inmon.sflowtrend.b</class>
+  <method>t</method>
+  <thread>1</thread>
+  <message>Product: sFlowTrend</message>
+</record>
+<record>
+  <date>2017-07-24T07:20:11</date>
+  <millis>1500877211664</millis>
+  <sequence>6</sequence>
+  <logger>com.inmon.sflowtrend.flowmgr</logger>
+  <level>INFO</level>
+  <class>com.inmon.sflowtrend.k.c</class>
+  <method>&lt;init&gt;</method>
+  <thread>1</thread>
+  <message>MemoryMgr.MemoryMgr: memory threshold set to 1378877440</message>
+</record>
+<record>
+  <date>2017-07-24T07:20:11</date>
+  <millis>1500877211759</millis>
+  <sequence>7</sequence>
+  <logger>com.inmon.sflowtrend.server</logger>
+  <level>INFO</level>
+  <class>com.inmon.sflowtrend.f.c</class>
+  <method>&lt;init&gt;</method>
+  <thread>1</thread>
+  <message>LocalServer.LocalServer: server created</message>
+</record>
+<record>
+  <date>2017-07-24T07:20:11</date>
+  <millis>1500877211845</millis>
+  <sequence>8</sequence>
+  <logger>org.eclipse.jetty.util.log</logger>
+  <level>INFO</level>
+  <class>org.eclipse.jetty.util.log.JavaUtilLog</class>
+  <method>info</method>
+  <thread>1</thread>
+  <message>Logging initialized @1219ms</message>
+</record>
+<record>
+  <date>2017-07-24T07:20:11</date>
+  <millis>1500877211988</millis>
+  <sequence>9</sequence>
+  <logger>com.inmon.sflowtrend.report</logger>
+  <level>INFO</level>
+  <class>com.inmon.sflowtrend.g.b</class>
+  <method>q</method>
+  <thread>1</thread>
+  <message>ReportStore.copySystemReports: instantiating system reports</message>
+</record>
+<record>
+  <date>2017-07-24T07:20:12</date>
+  <millis>1500877212143</millis>
+  <sequence>10</sequence>
+  <logger>org.eclipse.jetty.server.Server</logger>
+  <level>INFO</level>
+  <class>org.eclipse.jetty.util.log.JavaUtilLog</class>
+  <method>info</method>
+  <thread>1</thread>
+  <message>jetty-9.2.21.v20170120</message>
+</record>
+<record>
+  <date>2017-07-24T07:20:12</date>
+  <millis>1500877212167</millis>
+  <sequence>11</sequence>
+  <logger>org.eclipse.jetty.server.handler.ContextHandler</logger>
+  <level>INFO</level>
+  <class>org.eclipse.jetty.util.log.JavaUtilLog</class>
+  <method>info</method>
+  <thread>1</thread>
+  <message>Started o.e.j.s.ServletContextHandler@7cd05663{/sflowtrend,jar:file:/opt/sflowtrend-pro/lib/sflowtrend.jar!/client,AVAILABLE}</message>
+</record>
+<record>
+  <date>2017-07-24T07:20:12</date>
+  <millis>1500877212168</millis>
+  <sequence>12</sequence>
+  <logger>org.eclipse.jetty.server.Server</logger>
+  <level>INFO</level>
+  <class>org.eclipse.jetty.util.log.JavaUtilLog</class>
+  <method>info</method>
+  <thread>1</thread>
+  <message>Started @1541ms</message>
+</record>
+<record>
+  <date>2017-07-24T07:20:12</date>
+  <millis>1500877212195</millis>
+  <sequence>13</sequence>
+  <logger>org.eclipse.jetty.server.ServerConnector</logger>
+  <level>INFO</level>
+  <class>org.eclipse.jetty.util.log.JavaUtilLog</class>
+  <method>info</method>
+  <thread>1</thread>
+  <message>Started ServerConnector@4f6266{HTTP/1.1}{0.0.0.0:8087}</message>
+</record>
+<record>
+  <date>2017-07-24T07:20:12</date>
+  <millis>1500877212196</millis>
+  <sequence>14</sequence>
+  <logger>com.inmon.sflowtrend.server</logger>
+  <level>INFO</level>
+  <class>com.inmon.sflowtrend.f.c</class>
+  <method>oc</method>
+  <thread>1</thread>
+  <message>LocalServer.createHttpServer: created http server on port 8087</message>
+</record>
+<record>
+  <date>2017-07-24T07:20:12</date>
+  <millis>1500877212197</millis>
+  <sequence>15</sequence>
+  <logger>com.inmon.sflowtrend.server</logger>
+  <level>INFO</level>
+  <class>com.inmon.sflowtrend.f.c</class>
+  <method>wd</method>
+  <thread>1</thread>
+  <message>LocalServer.getKeyStore: could not read key store at /var/local/sflowtrend-pro/httpsKeyStore, trying to create</message>
+</record>
+<record>
+  <date>2017-07-24T07:20:12</date>
+  <millis>1500877212859</millis>
+  <sequence>16</sequence>
+  <logger>org.eclipse.jetty.server.ServerConnector</logger>
+  <level>INFO</level>
+  <class>org.eclipse.jetty.util.log.JavaUtilLog</class>
+  <method>info</method>
+  <thread>1</thread>
+  <message>Started ServerConnector@6181ab1{SSL-http/1.1}{0.0.0.0:8443}</message>
+</record>
+<record>
+  <date>2017-07-24T07:20:12</date>
+  <millis>1500877212871</millis>
+  <sequence>17</sequence>
+  <logger>com.inmon.sflowtrend.server</logger>
+  <level>INFO</level>
+  <class>com.inmon.sflowtrend.f.c</class>
+  <method>oc</method>
+  <thread>1</thread>
+  <message>LocalServer.createHttpServer: created https server on port 8443</message>
+</record>
+<record>
+  <date>2017-07-24T07:20:44</date>
+  <millis>1500877244645</millis>
+  <sequence>18</sequence>
+  <logger>com.inmon.sflowtrend.server</logger>
+  <level>INFO</level>
+  <class>com.inmon.sflowtrend.f.c</class>
+  <method>x</method>
+  <thread>49</thread>
+  <message>LocalServer.connect: 221.219.133.112 connected as user: null role: administrator</message>
+</record>
+<record>
+  <date>2017-07-24T07:21:33</date>
+  <millis>1500877293296</millis>
+  <sequence>19</sequence>
+  <logger>com.inmon.sflowtrend.server</logger>
+  <level>INFO</level>
+  <class>com.inmon.sflowtrend.f.d</class>
+  <method>r</method>
+  <thread>47</thread>
+  <message>LicenseManager.licenseNowValid: loaded new license: SFT-FREE</message>
+</record>
