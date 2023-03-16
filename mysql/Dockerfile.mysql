@@ -1,8 +1,0 @@
-FROM mysql:5.6
-# Setup environment
-ENV DEBIAN_FRONTEND noninteractive
-RUN echo 'export PS1="[\u@mysql] \W#"' >> /root/.bashrc
-
-RUN echo "Asia/Chongqing" > /etc/timezone
-RUN dpkg-reconfigure -f noninteractive tzdata
-ADD my.cnf /etc/mysql/my.cnf

@@ -1,0 +1,467 @@
+<?xml version="1.0" encoding="US-ASCII" standalone="no"?>
+<!DOCTYPE log SYSTEM "logger.dtd">
+<log>
+<record>
+  <date>2017-08-30T08:01:51</date>
+  <millis>1504051311152</millis>
+  <sequence>0</sequence>
+  <logger>com.inmon.sflowtrend</logger>
+  <level>CONFIG</level>
+  <class>com.inmon.sflowtrend.b</class>
+  <method>s</method>
+  <thread>1</thread>
+  <message>sFlowTrend version 6.5.04, revision 4567</message>
+</record>
+<record>
+  <date>2017-08-30T08:01:51</date>
+  <millis>1504051311152</millis>
+  <sequence>1</sequence>
+  <logger>com.inmon.sflowtrend</logger>
+  <level>CONFIG</level>
+  <class>com.inmon.sflowtrend.b</class>
+  <method>s</method>
+  <thread>1</thread>
+  <message>Java: Oracle Corporation 1.7.0_121
+OS: Linux 3.10.0-514.6.1.el7.x86_64 amd64
+Free mem: 992476936, max mem: 1908932608</message>
+</record>
+<record>
+  <date>2017-08-30T08:01:51</date>
+  <millis>1504051311504</millis>
+  <sequence>2</sequence>
+  <logger>com.inmon.sflowtrend</logger>
+  <level>CONFIG</level>
+  <class>com.inmon.sflowtrend.b</class>
+  <method>t</method>
+  <thread>1</thread>
+  <message>Product: sFlowTrend, licenseID: SFT-FREE</message>
+</record>
+<record>
+  <date>2017-08-30T08:01:51</date>
+  <millis>1504051311915</millis>
+  <sequence>3</sequence>
+  <logger>com.inmon.sflowtrend.flowmgr</logger>
+  <level>INFO</level>
+  <class>com.inmon.sflowtrend.k.c</class>
+  <method>&lt;init&gt;</method>
+  <thread>1</thread>
+  <message>MemoryMgr.MemoryMgr: memory threshold set to 1378877440</message>
+</record>
+<record>
+  <date>2017-08-30T08:01:51</date>
+  <millis>1504051311986</millis>
+  <sequence>4</sequence>
+  <logger>com.inmon.sflowtrend.server</logger>
+  <level>INFO</level>
+  <class>com.inmon.sflowtrend.f.c</class>
+  <method>&lt;init&gt;</method>
+  <thread>1</thread>
+  <message>LocalServer.LocalServer: server created</message>
+</record>
+<record>
+  <date>2017-08-30T08:01:52</date>
+  <millis>1504051312070</millis>
+  <sequence>5</sequence>
+  <logger>org.eclipse.jetty.util.log</logger>
+  <level>INFO</level>
+  <class>org.eclipse.jetty.util.log.JavaUtilLog</class>
+  <method>info</method>
+  <thread>1</thread>
+  <message>Logging initialized @1119ms</message>
+</record>
+<record>
+  <date>2017-08-30T08:01:52</date>
+  <millis>1504051312222</millis>
+  <sequence>6</sequence>
+  <logger>org.eclipse.jetty.server.Server</logger>
+  <level>INFO</level>
+  <class>org.eclipse.jetty.util.log.JavaUtilLog</class>
+  <method>info</method>
+  <thread>1</thread>
+  <message>jetty-9.2.21.v20170120</message>
+</record>
+<record>
+  <date>2017-08-30T08:01:52</date>
+  <millis>1504051312246</millis>
+  <sequence>7</sequence>
+  <logger>org.eclipse.jetty.server.handler.ContextHandler</logger>
+  <level>INFO</level>
+  <class>org.eclipse.jetty.util.log.JavaUtilLog</class>
+  <method>info</method>
+  <thread>1</thread>
+  <message>Started o.e.j.s.ServletContextHandler@177e7ce2{/sflowtrend,jar:file:/opt/sflowtrend-pro/lib/sflowtrend.jar!/client,AVAILABLE}</message>
+</record>
+<record>
+  <date>2017-08-30T08:01:52</date>
+  <millis>1504051312247</millis>
+  <sequence>8</sequence>
+  <logger>org.eclipse.jetty.server.Server</logger>
+  <level>INFO</level>
+  <class>org.eclipse.jetty.util.log.JavaUtilLog</class>
+  <method>info</method>
+  <thread>1</thread>
+  <message>Started @1297ms</message>
+</record>
+<record>
+  <date>2017-08-30T08:01:52</date>
+  <millis>1504051312268</millis>
+  <sequence>9</sequence>
+  <logger>org.eclipse.jetty.server.ServerConnector</logger>
+  <level>INFO</level>
+  <class>org.eclipse.jetty.util.log.JavaUtilLog</class>
+  <method>info</method>
+  <thread>1</thread>
+  <message>Started ServerConnector@2a094cd7{HTTP/1.1}{0.0.0.0:8087}</message>
+</record>
+<record>
+  <date>2017-08-30T08:01:52</date>
+  <millis>1504051312269</millis>
+  <sequence>10</sequence>
+  <logger>com.inmon.sflowtrend.server</logger>
+  <level>INFO</level>
+  <class>com.inmon.sflowtrend.f.c</class>
+  <method>oc</method>
+  <thread>1</thread>
+  <message>LocalServer.createHttpServer: created http server on port 8087</message>
+</record>
+<record>
+  <date>2017-08-30T08:01:52</date>
+  <millis>1504051312395</millis>
+  <sequence>11</sequence>
+  <logger>org.eclipse.jetty.server.ServerConnector</logger>
+  <level>INFO</level>
+  <class>org.eclipse.jetty.util.log.JavaUtilLog</class>
+  <method>info</method>
+  <thread>1</thread>
+  <message>Started ServerConnector@48632c47{SSL-http/1.1}{0.0.0.0:8443}</message>
+</record>
+<record>
+  <date>2017-08-30T08:01:52</date>
+  <millis>1504051312396</millis>
+  <sequence>12</sequence>
+  <logger>com.inmon.sflowtrend.server</logger>
+  <level>INFO</level>
+  <class>com.inmon.sflowtrend.f.c</class>
+  <method>oc</method>
+  <thread>1</thread>
+  <message>LocalServer.createHttpServer: created https server on port 8443</message>
+</record>
+<record>
+  <date>2017-08-31T21:28:32</date>
+  <millis>1504186112378</millis>
+  <sequence>13</sequence>
+  <logger>com.inmon.sflowtrend.server</logger>
+  <level>INFO</level>
+  <class>com.inmon.sflowtrend.f.c</class>
+  <method>x</method>
+  <thread>2769</thread>
+  <message>LocalServer.connect: 123.123.99.8 connected as user: cnix_noc role: administrator</message>
+</record>
+<record>
+  <date>2017-09-02T06:48:32</date>
+  <millis>1504306112249</millis>
+  <sequence>14</sequence>
+  <logger>org.eclipse.jetty.http.HttpParser</logger>
+  <level>WARNING</level>
+  <class>org.eclipse.jetty.util.log.JavaUtilLog</class>
+  <method>warn</method>
+  <thread>5194</thread>
+  <message>badMessage: 400 No URI for HttpChannelOverHttp@1e7decaa{r=0,c=false,a=IDLE,uri=}</message>
+</record>
+<record>
+  <date>2017-09-04T12:58:59</date>
+  <millis>1504501139886</millis>
+  <sequence>15</sequence>
+  <logger>com.inmon.sflowtrend.server</logger>
+  <level>INFO</level>
+  <class>com.inmon.sflowtrend.f.c</class>
+  <method>x</method>
+  <thread>9134</thread>
+  <message>LocalServer.connect: 114.113.88.30 connected as user: cnix_noc role: administrator</message>
+</record>
+<record>
+  <date>2017-09-04T23:27:12</date>
+  <millis>1504538832714</millis>
+  <sequence>16</sequence>
+  <logger>org.eclipse.jetty.http.HttpParser</logger>
+  <level>WARNING</level>
+  <class>org.eclipse.jetty.util.log.JavaUtilLog</class>
+  <method>warn</method>
+  <thread>9895</thread>
+  <message>Illegal character 0x3 in state=START for buffer HeapByteBuffer@4acc5dac[p=1,l=43,c=8192,r=42]={\x03&lt;&lt;&lt;\x00\x00+&amp;\xE0\x00\x00\x00\x00\x00Cookie:...hello\r\n\x01\x00\x08\x00\x03\x00\x00\x00&gt;&gt;&gt;29:24 GMT\r\nConten...\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00}</message>
+</record>
+<record>
+  <date>2017-09-04T23:27:12</date>
+  <millis>1504538832715</millis>
+  <sequence>17</sequence>
+  <logger>org.eclipse.jetty.http.HttpParser</logger>
+  <level>WARNING</level>
+  <class>org.eclipse.jetty.util.log.JavaUtilLog</class>
+  <method>warn</method>
+  <thread>9895</thread>
+  <message>badMessage: 400 Illegal character 0x3 for HttpChannelOverHttp@2f19ed91{r=0,c=false,a=IDLE,uri=}</message>
+</record>
+<record>
+  <date>2017-09-05T00:22:00</date>
+  <millis>1504542120570</millis>
+  <sequence>18</sequence>
+  <logger>org.eclipse.jetty.http.HttpParser</logger>
+  <level>WARNING</level>
+  <class>org.eclipse.jetty.util.log.JavaUtilLog</class>
+  <method>warn</method>
+  <thread>9960</thread>
+  <message>Illegal character 0x3 in state=START for buffer HeapByteBuffer@49fa84bb[p=1,l=43,c=8192,r=42]={\x03&lt;&lt;&lt;\x00\x00+&amp;\xE0\x00\x00\x00\x00\x00Cookie:...hello\r\n\x01\x00\x08\x00\x03\x00\x00\x00&gt;&gt;&gt;1504510170000 HTT...\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00}</message>
+</record>
+<record>
+  <date>2017-09-05T00:22:00</date>
+  <millis>1504542120571</millis>
+  <sequence>19</sequence>
+  <logger>org.eclipse.jetty.http.HttpParser</logger>
+  <level>WARNING</level>
+  <class>org.eclipse.jetty.util.log.JavaUtilLog</class>
+  <method>warn</method>
+  <thread>9960</thread>
+  <message>badMessage: 400 Illegal character 0x3 for HttpChannelOverHttp@5e2036ee{r=0,c=false,a=IDLE,uri=}</message>
+</record>
+<record>
+  <date>2017-09-05T01:16:34</date>
+  <millis>1504545394892</millis>
+  <sequence>20</sequence>
+  <logger>org.eclipse.jetty.http.HttpParser</logger>
+  <level>WARNING</level>
+  <class>org.eclipse.jetty.util.log.JavaUtilLog</class>
+  <method>warn</method>
+  <thread>10025</thread>
+  <message>Illegal character 0x3 in state=START for buffer HeapByteBuffer@6a233f34[p=1,l=43,c=8192,r=42]={\x03&lt;&lt;&lt;\x00\x00+&amp;\xE0\x00\x00\x00\x00\x00Cookie:...hello\r\n\x01\x00\x08\x00\x03\x00\x00\x00&gt;&gt;&gt;29:00 GMT\r\nConten...\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00}</message>
+</record>
+<record>
+  <date>2017-09-05T01:16:34</date>
+  <millis>1504545394893</millis>
+  <sequence>21</sequence>
+  <logger>org.eclipse.jetty.http.HttpParser</logger>
+  <level>WARNING</level>
+  <class>org.eclipse.jetty.util.log.JavaUtilLog</class>
+  <method>warn</method>
+  <thread>10025</thread>
+  <message>badMessage: 400 Illegal character 0x3 for HttpChannelOverHttp@300aa55c{r=0,c=false,a=IDLE,uri=}</message>
+</record>
+<record>
+  <date>2017-09-07T13:34:18</date>
+  <millis>1504762458046</millis>
+  <sequence>22</sequence>
+  <logger>org.eclipse.jetty.http.HttpParser</logger>
+  <level>WARNING</level>
+  <class>org.eclipse.jetty.util.log.JavaUtilLog</class>
+  <method>warn</method>
+  <thread>14410</thread>
+  <message>badMessage: 400 No Host for HttpChannelOverHttp@136eba88{r=0,c=false,a=IDLE,uri=/}</message>
+</record>
+<record>
+  <date>2017-09-08T11:35:07</date>
+  <millis>1504841707693</millis>
+  <sequence>23</sequence>
+  <logger>org.eclipse.jetty.http.HttpParser</logger>
+  <level>WARNING</level>
+  <class>org.eclipse.jetty.util.log.JavaUtilLog</class>
+  <method>warn</method>
+  <thread>16012</thread>
+  <message>Illegal character 0x3 in state=START for buffer HeapByteBuffer@6a233f34[p=1,l=43,c=8192,r=42]={\x03&lt;&lt;&lt;\x00\x00+&amp;\xE0\x00\x00\x00\x00\x00Cookie:...hello\r\n\x01\x00\x08\x00\x03\x00\x00\x00&gt;&gt;&gt;017 18:30:07 GMT\r...\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00}</message>
+</record>
+<record>
+  <date>2017-09-08T11:35:07</date>
+  <millis>1504841707694</millis>
+  <sequence>24</sequence>
+  <logger>org.eclipse.jetty.http.HttpParser</logger>
+  <level>WARNING</level>
+  <class>org.eclipse.jetty.util.log.JavaUtilLog</class>
+  <method>warn</method>
+  <thread>16012</thread>
+  <message>badMessage: 400 Illegal character 0x3 for HttpChannelOverHttp@11ebeade{r=0,c=false,a=IDLE,uri=}</message>
+</record>
+<record>
+  <date>2017-09-08T12:20:52</date>
+  <millis>1504844452453</millis>
+  <sequence>25</sequence>
+  <logger>org.eclipse.jetty.http.HttpParser</logger>
+  <level>WARNING</level>
+  <class>org.eclipse.jetty.util.log.JavaUtilLog</class>
+  <method>warn</method>
+  <thread>16067</thread>
+  <message>Illegal character 0x3 in state=START for buffer HeapByteBuffer@3eb5e81d[p=1,l=43,c=8192,r=42]={\x03&lt;&lt;&lt;\x00\x00+&amp;\xE0\x00\x00\x00\x00\x00Cookie:...hello\r\n\x01\x00\x08\x00\x03\x00\x00\x00&gt;&gt;&gt;017 22:57:12 GMT\r...\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00}</message>
+</record>
+<record>
+  <date>2017-09-08T12:20:52</date>
+  <millis>1504844452454</millis>
+  <sequence>26</sequence>
+  <logger>org.eclipse.jetty.http.HttpParser</logger>
+  <level>WARNING</level>
+  <class>org.eclipse.jetty.util.log.JavaUtilLog</class>
+  <method>warn</method>
+  <thread>16067</thread>
+  <message>badMessage: 400 Illegal character 0x3 for HttpChannelOverHttp@1899e815{r=0,c=false,a=IDLE,uri=}</message>
+</record>
+<record>
+  <date>2017-09-08T13:07:00</date>
+  <millis>1504847220424</millis>
+  <sequence>27</sequence>
+  <logger>org.eclipse.jetty.http.HttpParser</logger>
+  <level>WARNING</level>
+  <class>org.eclipse.jetty.util.log.JavaUtilLog</class>
+  <method>warn</method>
+  <thread>16122</thread>
+  <message>Illegal character 0x3 in state=START for buffer HeapByteBuffer@63f10aca[p=1,l=43,c=8192,r=42]={\x03&lt;&lt;&lt;\x00\x00+&amp;\xE0\x00\x00\x00\x00\x00Cookie:...hello\r\n\x01\x00\x08\x00\x03\x00\x00\x00&gt;&gt;&gt;017 16:22:18 GMT\r...\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00}</message>
+</record>
+<record>
+  <date>2017-09-08T13:07:00</date>
+  <millis>1504847220425</millis>
+  <sequence>28</sequence>
+  <logger>org.eclipse.jetty.http.HttpParser</logger>
+  <level>WARNING</level>
+  <class>org.eclipse.jetty.util.log.JavaUtilLog</class>
+  <method>warn</method>
+  <thread>16122</thread>
+  <message>badMessage: 400 Illegal character 0x3 for HttpChannelOverHttp@65fb8708{r=0,c=false,a=IDLE,uri=}</message>
+</record>
+<record>
+  <date>2017-09-10T09:21:12</date>
+  <millis>1505006472996</millis>
+  <sequence>29</sequence>
+  <logger>org.eclipse.jetty.http.HttpParser</logger>
+  <level>WARNING</level>
+  <class>org.eclipse.jetty.util.log.JavaUtilLog</class>
+  <method>warn</method>
+  <thread>19339</thread>
+  <message>badMessage: 400 No URI for HttpChannelOverHttp@751cd02{r=0,c=false,a=IDLE,uri=}</message>
+</record>
+<record>
+  <date>2017-09-12T01:21:58</date>
+  <millis>1505150518857</millis>
+  <sequence>30</sequence>
+  <logger>org.eclipse.jetty.http.HttpParser</logger>
+  <level>WARNING</level>
+  <class>org.eclipse.jetty.util.log.JavaUtilLog</class>
+  <method>warn</method>
+  <thread>22247</thread>
+  <message>Illegal character 0x16 in state=START for buffer HeapByteBuffer@3eb5e81d[p=1,l=157,c=8192,r=156]={\x16&lt;&lt;&lt;\x03\x01\x00\x98\x01\x00\x00\x94\x03\x03\xDb\x14\xC8\xC9\xE8\xFbu...\x01\x05\x01\x06\x01\x02\x01\x04\x02\x05\x02\x06\x02\x02\x02&gt;&gt;&gt;ontent-Length: 29...\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00}</message>
+</record>
+<record>
+  <date>2017-09-12T01:21:58</date>
+  <millis>1505150518858</millis>
+  <sequence>31</sequence>
+  <logger>org.eclipse.jetty.http.HttpParser</logger>
+  <level>WARNING</level>
+  <class>org.eclipse.jetty.util.log.JavaUtilLog</class>
+  <method>warn</method>
+  <thread>22247</thread>
+  <message>badMessage: 400 Illegal character 0x16 for HttpChannelOverHttp@1c25e1cf{r=0,c=false,a=IDLE,uri=}</message>
+</record>
+<record>
+  <date>2017-09-13T08:53:50</date>
+  <millis>1505264030677</millis>
+  <sequence>32</sequence>
+  <logger>org.eclipse.jetty.http.HttpParser</logger>
+  <level>WARNING</level>
+  <class>org.eclipse.jetty.util.log.JavaUtilLog</class>
+  <method>warn</method>
+  <thread>24540</thread>
+  <message>badMessage: 400 No URI for HttpChannelOverHttp@7957dfa{r=0,c=false,a=IDLE,uri=}</message>
+</record>
+<record>
+  <date>2017-09-13T23:18:00</date>
+  <millis>1505315880745</millis>
+  <sequence>33</sequence>
+  <logger>org.eclipse.jetty.http.HttpParser</logger>
+  <level>WARNING</level>
+  <class>org.eclipse.jetty.util.log.JavaUtilLog</class>
+  <method>warn</method>
+  <thread>25586</thread>
+  <message>Illegal character 0x0 in state=START for buffer HeapByteBuffer@4acc5dac[p=1,l=5,c=8192,r=4]={\x00&lt;&lt;&lt;\x00\x00\x01\x07&gt;&gt;&gt;ttp://www.baidu.c...\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00}</message>
+</record>
+<record>
+  <date>2017-09-13T23:18:00</date>
+  <millis>1505315880746</millis>
+  <sequence>34</sequence>
+  <logger>org.eclipse.jetty.http.HttpParser</logger>
+  <level>WARNING</level>
+  <class>org.eclipse.jetty.util.log.JavaUtilLog</class>
+  <method>warn</method>
+  <thread>25586</thread>
+  <message>badMessage: 400 Illegal character 0x0 for HttpChannelOverHttp@4113086{r=0,c=false,a=IDLE,uri=}</message>
+</record>
+<record>
+  <date>2017-09-16T09:53:02</date>
+  <millis>1505526782401</millis>
+  <sequence>35</sequence>
+  <logger>org.eclipse.jetty.http.HttpParser</logger>
+  <level>WARNING</level>
+  <class>org.eclipse.jetty.util.log.JavaUtilLog</class>
+  <method>warn</method>
+  <thread>29846</thread>
+  <message>Illegal character 0x0 in state=START for buffer HeapByteBuffer@63f10aca[p=1,l=5,c=8192,r=4]={\x00&lt;&lt;&lt;\x00\x00\x01\x07&gt;&gt;&gt;1.1 404 Not Found...\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00}</message>
+</record>
+<record>
+  <date>2017-09-16T09:53:02</date>
+  <millis>1505526782402</millis>
+  <sequence>36</sequence>
+  <logger>org.eclipse.jetty.http.HttpParser</logger>
+  <level>WARNING</level>
+  <class>org.eclipse.jetty.util.log.JavaUtilLog</class>
+  <method>warn</method>
+  <thread>29846</thread>
+  <message>badMessage: 400 Illegal character 0x0 for HttpChannelOverHttp@854ae5f{r=0,c=false,a=IDLE,uri=}</message>
+</record>
+<record>
+  <date>2017-09-16T21:32:56</date>
+  <millis>1505568776280</millis>
+  <sequence>37</sequence>
+  <logger>org.eclipse.jetty.http.HttpParser</logger>
+  <level>WARNING</level>
+  <class>org.eclipse.jetty.util.log.JavaUtilLog</class>
+  <method>warn</method>
+  <thread>30690</thread>
+  <message>badMessage: 400 No Host for HttpChannelOverHttp@23c34c08{r=0,c=false,a=IDLE,uri=/}</message>
+</record>
+<record>
+  <date>2017-09-18T16:24:22</date>
+  <millis>1505723062706</millis>
+  <sequence>38</sequence>
+  <logger>org.eclipse.jetty.http.HttpParser</logger>
+  <level>WARNING</level>
+  <class>org.eclipse.jetty.util.log.JavaUtilLog</class>
+  <method>warn</method>
+  <thread>33807</thread>
+  <message>Illegal character 0x0 in state=START for buffer HeapByteBuffer@6a233f34[p=1,l=5,c=8192,r=4]={\x00&lt;&lt;&lt;\x00\x00\x01\x07&gt;&gt;&gt;manager/html HTTP...\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00}</message>
+</record>
+<record>
+  <date>2017-09-18T16:24:22</date>
+  <millis>1505723062706</millis>
+  <sequence>39</sequence>
+  <logger>org.eclipse.jetty.http.HttpParser</logger>
+  <level>WARNING</level>
+  <class>org.eclipse.jetty.util.log.JavaUtilLog</class>
+  <method>warn</method>
+  <thread>33807</thread>
+  <message>badMessage: 400 Illegal character 0x0 for HttpChannelOverHttp@4d242b72{r=0,c=false,a=IDLE,uri=}</message>
+</record>
+<record>
+  <date>2017-09-19T21:47:21</date>
+  <millis>1505828841596</millis>
+  <sequence>40</sequence>
+  <logger>org.eclipse.jetty.http.HttpParser</logger>
+  <level>WARNING</level>
+  <class>org.eclipse.jetty.util.log.JavaUtilLog</class>
+  <method>warn</method>
+  <thread>35940</thread>
+  <message>badMessage: 400 No Host for HttpChannelOverHttp@1bba0e30{r=0,c=false,a=IDLE,uri=/}</message>
+</record>
+<record>
+  <date>2017-09-21T23:20:14</date>
+  <millis>1506007214232</millis>
+  <sequence>41</sequence>
+  <logger>org.eclipse.jetty.http.HttpParser</logger>
+  <level>WARNING</level>
+  <class>org.eclipse.jetty.util.log.JavaUtilLog</class>
+  <method>warn</method>
+  <thread>39546</thread>
+  <message>badMessage: 400 No Host for HttpChannelOverHttp@1cfcc828{r=0,c=false,a=IDLE,uri=/}</message>
+</record>

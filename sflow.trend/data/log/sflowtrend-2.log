@@ -1,0 +1,270 @@
+<?xml version="1.0" encoding="US-ASCII" standalone="no"?>
+<!DOCTYPE log SYSTEM "logger.dtd">
+<log>
+<record>
+  <date>2017-07-26T21:34:25</date>
+  <millis>1501076065678</millis>
+  <sequence>0</sequence>
+  <logger>com.inmon.sflowtrend</logger>
+  <level>CONFIG</level>
+  <class>com.inmon.sflowtrend.b</class>
+  <method>s</method>
+  <thread>1</thread>
+  <message>sFlowTrend version 6.5.04, revision 4567</message>
+</record>
+<record>
+  <date>2017-07-26T21:34:25</date>
+  <millis>1501076065679</millis>
+  <sequence>1</sequence>
+  <logger>com.inmon.sflowtrend</logger>
+  <level>CONFIG</level>
+  <class>com.inmon.sflowtrend.b</class>
+  <method>s</method>
+  <thread>1</thread>
+  <message>Java: Oracle Corporation 1.7.0_121
+OS: Linux 3.10.0-514.6.1.el7.x86_64 amd64
+Free mem: 992476936, max mem: 1908932608</message>
+</record>
+<record>
+  <date>2017-07-26T21:34:26</date>
+  <millis>1501076066030</millis>
+  <sequence>2</sequence>
+  <logger>com.inmon.sflowtrend</logger>
+  <level>CONFIG</level>
+  <class>com.inmon.sflowtrend.b</class>
+  <method>t</method>
+  <thread>1</thread>
+  <message>Product: sFlowTrend, licenseID: SFT-FREE</message>
+</record>
+<record>
+  <date>2017-07-26T21:34:26</date>
+  <millis>1501076066442</millis>
+  <sequence>3</sequence>
+  <logger>com.inmon.sflowtrend.flowmgr</logger>
+  <level>INFO</level>
+  <class>com.inmon.sflowtrend.k.c</class>
+  <method>&lt;init&gt;</method>
+  <thread>1</thread>
+  <message>MemoryMgr.MemoryMgr: memory threshold set to 1378877440</message>
+</record>
+<record>
+  <date>2017-07-26T21:34:26</date>
+  <millis>1501076066514</millis>
+  <sequence>4</sequence>
+  <logger>com.inmon.sflowtrend.server</logger>
+  <level>INFO</level>
+  <class>com.inmon.sflowtrend.f.c</class>
+  <method>&lt;init&gt;</method>
+  <thread>1</thread>
+  <message>LocalServer.LocalServer: server created</message>
+</record>
+<record>
+  <date>2017-07-26T21:34:26</date>
+  <millis>1501076066596</millis>
+  <sequence>5</sequence>
+  <logger>org.eclipse.jetty.util.log</logger>
+  <level>INFO</level>
+  <class>org.eclipse.jetty.util.log.JavaUtilLog</class>
+  <method>info</method>
+  <thread>1</thread>
+  <message>Logging initialized @1114ms</message>
+</record>
+<record>
+  <date>2017-07-26T21:34:26</date>
+  <millis>1501076066749</millis>
+  <sequence>6</sequence>
+  <logger>org.eclipse.jetty.server.Server</logger>
+  <level>INFO</level>
+  <class>org.eclipse.jetty.util.log.JavaUtilLog</class>
+  <method>info</method>
+  <thread>1</thread>
+  <message>jetty-9.2.21.v20170120</message>
+</record>
+<record>
+  <date>2017-07-26T21:34:26</date>
+  <millis>1501076066773</millis>
+  <sequence>7</sequence>
+  <logger>org.eclipse.jetty.server.handler.ContextHandler</logger>
+  <level>INFO</level>
+  <class>org.eclipse.jetty.util.log.JavaUtilLog</class>
+  <method>info</method>
+  <thread>1</thread>
+  <message>Started o.e.j.s.ServletContextHandler@5720be65{/sflowtrend,jar:file:/opt/sflowtrend-pro/lib/sflowtrend.jar!/client,AVAILABLE}</message>
+</record>
+<record>
+  <date>2017-07-26T21:34:26</date>
+  <millis>1501076066774</millis>
+  <sequence>8</sequence>
+  <logger>org.eclipse.jetty.server.Server</logger>
+  <level>INFO</level>
+  <class>org.eclipse.jetty.util.log.JavaUtilLog</class>
+  <method>info</method>
+  <thread>1</thread>
+  <message>Started @1292ms</message>
+</record>
+<record>
+  <date>2017-07-26T21:34:26</date>
+  <millis>1501076066795</millis>
+  <sequence>9</sequence>
+  <logger>org.eclipse.jetty.server.ServerConnector</logger>
+  <level>INFO</level>
+  <class>org.eclipse.jetty.util.log.JavaUtilLog</class>
+  <method>info</method>
+  <thread>1</thread>
+  <message>Started ServerConnector@fe7a5bd{HTTP/1.1}{0.0.0.0:8087}</message>
+</record>
+<record>
+  <date>2017-07-26T21:34:26</date>
+  <millis>1501076066795</millis>
+  <sequence>10</sequence>
+  <logger>com.inmon.sflowtrend.server</logger>
+  <level>INFO</level>
+  <class>com.inmon.sflowtrend.f.c</class>
+  <method>oc</method>
+  <thread>1</thread>
+  <message>LocalServer.createHttpServer: created http server on port 8087</message>
+</record>
+<record>
+  <date>2017-07-26T21:34:26</date>
+  <millis>1501076066923</millis>
+  <sequence>11</sequence>
+  <logger>org.eclipse.jetty.server.ServerConnector</logger>
+  <level>INFO</level>
+  <class>org.eclipse.jetty.util.log.JavaUtilLog</class>
+  <method>info</method>
+  <thread>1</thread>
+  <message>Started ServerConnector@bbeead4{SSL-http/1.1}{0.0.0.0:8443}</message>
+</record>
+<record>
+  <date>2017-07-26T21:34:26</date>
+  <millis>1501076066924</millis>
+  <sequence>12</sequence>
+  <logger>com.inmon.sflowtrend.server</logger>
+  <level>INFO</level>
+  <class>com.inmon.sflowtrend.f.c</class>
+  <method>oc</method>
+  <thread>1</thread>
+  <message>LocalServer.createHttpServer: created https server on port 8443</message>
+</record>
+<record>
+  <date>2017-07-29T14:05:23</date>
+  <millis>1501308323671</millis>
+  <sequence>13</sequence>
+  <logger>org.eclipse.jetty.http.HttpParser</logger>
+  <level>WARNING</level>
+  <class>org.eclipse.jetty.util.log.JavaUtilLog</class>
+  <method>warn</method>
+  <thread>4737</thread>
+  <message>Illegal character 0x0 in state=START for buffer HeapByteBuffer@152b2f71[p=1,l=5,c=8192,r=4]={\x00&lt;&lt;&lt;\x00\x00\x01\x07&gt;&gt;&gt;1.1 404 Not Found...\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00}</message>
+</record>
+<record>
+  <date>2017-07-29T14:05:23</date>
+  <millis>1501308323673</millis>
+  <sequence>14</sequence>
+  <logger>org.eclipse.jetty.http.HttpParser</logger>
+  <level>WARNING</level>
+  <class>org.eclipse.jetty.util.log.JavaUtilLog</class>
+  <method>warn</method>
+  <thread>4737</thread>
+  <message>badMessage: 400 Illegal character 0x0 for HttpChannelOverHttp@4637ae92{r=0,c=false,a=IDLE,uri=}</message>
+</record>
+<record>
+  <date>2017-07-29T21:06:38</date>
+  <millis>1501333598170</millis>
+  <sequence>15</sequence>
+  <logger>com.inmon.sflowtrend.server</logger>
+  <level>INFO</level>
+  <class>com.inmon.sflowtrend.f.d.c</class>
+  <method>e</method>
+  <thread>5244</thread>
+  <message>PersistentSesions.authorise: 221.221.241.21 connected as user: cnix_noc</message>
+</record>
+<record>
+  <date>2017-07-30T21:04:12</date>
+  <millis>1501419852801</millis>
+  <sequence>16</sequence>
+  <logger>com.inmon.sflowtrend.server</logger>
+  <level>INFO</level>
+  <class>com.inmon.sflowtrend.f.d.c</class>
+  <method>e</method>
+  <thread>6989</thread>
+  <message>PersistentSesions.authorise: 221.221.241.21 connected as user: cnix_noc</message>
+</record>
+<record>
+  <date>2017-08-04T02:22:39</date>
+  <millis>1501784559495</millis>
+  <sequence>17</sequence>
+  <logger>org.eclipse.jetty.http.HttpParser</logger>
+  <level>WARNING</level>
+  <class>org.eclipse.jetty.util.log.JavaUtilLog</class>
+  <method>warn</method>
+  <thread>14360</thread>
+  <message>badMessage: 400 No URI for HttpChannelOverHttp@2f4e57fa{r=0,c=false,a=IDLE,uri=}</message>
+</record>
+<record>
+  <date>2017-08-05T04:30:03</date>
+  <millis>1501878603817</millis>
+  <sequence>18</sequence>
+  <logger>org.eclipse.jetty.http.HttpParser</logger>
+  <level>WARNING</level>
+  <class>org.eclipse.jetty.util.log.JavaUtilLog</class>
+  <method>warn</method>
+  <thread>16256</thread>
+  <message>badMessage: 400 No URI for HttpChannelOverHttp@78d81e8e{r=0,c=false,a=IDLE,uri=}</message>
+</record>
+<record>
+  <date>2017-08-07T22:56:13</date>
+  <millis>1502117773640</millis>
+  <sequence>19</sequence>
+  <logger>org.eclipse.jetty.http.HttpParser</logger>
+  <level>WARNING</level>
+  <class>org.eclipse.jetty.util.log.JavaUtilLog</class>
+  <method>warn</method>
+  <thread>21091</thread>
+  <message>Illegal character 0x0 in state=START for buffer HeapByteBuffer@2805d5a2[p=1,l=5,c=8192,r=4]={\x00&lt;&lt;&lt;\x00\x00\x01\x07&gt;&gt;&gt;ttp://www.baidu.c...\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00}</message>
+</record>
+<record>
+  <date>2017-08-07T22:56:13</date>
+  <millis>1502117773641</millis>
+  <sequence>20</sequence>
+  <logger>org.eclipse.jetty.http.HttpParser</logger>
+  <level>WARNING</level>
+  <class>org.eclipse.jetty.util.log.JavaUtilLog</class>
+  <method>warn</method>
+  <thread>21091</thread>
+  <message>badMessage: 400 Illegal character 0x0 for HttpChannelOverHttp@170c9335{r=0,c=false,a=IDLE,uri=}</message>
+</record>
+<record>
+  <date>2017-08-13T19:42:17</date>
+  <millis>1502624537403</millis>
+  <sequence>21</sequence>
+  <logger>com.inmon.sflowtrend.server</logger>
+  <level>INFO</level>
+  <class>com.inmon.sflowtrend.f.c</class>
+  <method>x</method>
+  <thread>31333</thread>
+  <message>LocalServer.connect: 182.18.18.110 connected as user: cnix_noc role: administrator</message>
+</record>
+<record>
+  <date>2017-08-15T15:48:41</date>
+  <millis>1502783321718</millis>
+  <sequence>22</sequence>
+  <logger>org.eclipse.jetty.http.HttpParser</logger>
+  <level>WARNING</level>
+  <class>org.eclipse.jetty.util.log.JavaUtilLog</class>
+  <method>warn</method>
+  <thread>34530</thread>
+  <message>Illegal character 0x0 in state=START for buffer HeapByteBuffer@79db675d[p=1,l=5,c=8192,r=4]={\x00&lt;&lt;&lt;\x00\x00\x01\x07&gt;&gt;&gt;1.1 404 Not Found...\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00}</message>
+</record>
+<record>
+  <date>2017-08-15T15:48:41</date>
+  <millis>1502783321718</millis>
+  <sequence>23</sequence>
+  <logger>org.eclipse.jetty.http.HttpParser</logger>
+  <level>WARNING</level>
+  <class>org.eclipse.jetty.util.log.JavaUtilLog</class>
+  <method>warn</method>
+  <thread>34530</thread>
+  <message>badMessage: 400 Illegal character 0x0 for HttpChannelOverHttp@335f492b{r=0,c=false,a=IDLE,uri=}</message>
+</record>
+</log>

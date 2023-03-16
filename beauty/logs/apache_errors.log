@@ -1,3 +1,0 @@
-Created directory: /var/lib/snmp/mib_indexes
-[Sat Sep 23 19:34:12.168354 2017] [mpm_prefork:notice] [pid 31] AH00163: Apache/2.4.7 (Ubuntu) PHP/5.5.9-1ubuntu4.21 configured -- resuming normal operations
-[Sat Sep 23 19:34:12.168425 2017] [core:notice] [pid 31] AH00094: Command line: '/usr/sbin/apache2'

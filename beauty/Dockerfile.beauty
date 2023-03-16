@@ -1,2 +1,0 @@
-FROM ixp.webframework
-ENTRYPOINT service apache2 start && bash

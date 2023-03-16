@@ -1,0 +1,11 @@
+{
+  "users" : {
+    "cnix_noc" : {
+      "name" : "cnix",
+      "password" : "B+Lx4/Ev9Jo7kFtSnFfQCgQ1GiQ=",
+      "role" : "administrator",
+      "salt" : "fyBEfs/iwTY=",
+      "version" : 1
+    }
+  }
+}

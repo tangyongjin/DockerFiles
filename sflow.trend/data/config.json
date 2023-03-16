@@ -1,0 +1,38 @@
+{
+  "proxy" : {
+    "type" : "none"
+  },
+  "email" : {
+    "server" : "",
+    "port" : "25",
+    "sender" : "",
+    "senderAddr" : "",
+    "encryption" : "none",
+    "authentication" : "true",
+    "username" : "",
+    "password" : "",
+    "domain" : ""
+  },
+  "subnets" : { },
+  "snmp" : {
+    "snmpVersion" : "v2c",
+    "community" : "test@111222",
+    "rwCommunity" : "public"
+  },
+  "sflow" : {
+    "localIP" : "172.17.0.2"
+  },
+  "agents" : {
+    "114.113.88.21" : {
+      "address" : "114.113.88.21",
+      "agentAddress" : "114.113.88.21",
+      "enabled" : "true",
+      "mib2only" : "true",
+      "useParentParams" : "true",
+      "sysname" : "bj.top.e.1.cnix",
+      "isWap" : "false",
+      "isSwitch" : "true"
+    }
+  },
+  "reportExceptionsConfigured" : "true"
+}
